@@ -130,6 +130,7 @@ class MainScreen(Screen):
     def __init__(self):
         super(MainScreen, self).__init__()
 
+
 class GameScreen(Screen):
     """
     Class to handle the game screen and its associated touch events
@@ -512,6 +513,61 @@ class LeftScreen(Screen):
         img.pos_hint = {"center_x": x_pos}
         img.color = 1, 1, 1, opacity
         img.size_hint = (size_hint, size_hint)
+
+
+class Instructions(Screen):
+    def __init__(self, **kwargs):
+        super(Instructions, self).__init__(**kwargs)
+        self.exit = False
+        Clock.schedule_interval(self.home, 1.0 / 60.0)
+
+    def home(self, dt):
+        global current_screen
+        global game_state
+
+        print("home running")
+
+        if not current_screen == 1:
+            print("exiting home")
+            return
+
+        if not self.exit and s.check_button_presses(3):
+            print("pressed")
+            SCREEN_MANAGER.transition.direction = "left"
+            SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+            current_screen = 0
+            game_state = False
+
+class Leaderboard(Screen):
+    # data = {}
+    #
+    # with open('high_scores.json') as f:
+    #     data = json.load(f)
+
+    def __init__(self, **kwargs):
+        super(Leaderboard, self).__init__(**kwargs)
+        self.exit = False
+        Clock.schedule_interval(self.back_to_home, 1.0 / 60.0)
+
+    def back_to_home(self, dt):
+        global current_screen
+        global game_state
+
+        if not current_screen == 2:
+            return
+
+        if not self.exit and s.check_button_presses(3):
+            SCREEN_MANAGER.transition.direction = "right" #right TO left
+            SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+            current_screen = 0
+            game_state = False
+
+    def fill_high_scores(self):
+        self.ids.lvl_one_high_score.text = "Level One: "
+        self.ids.lvl_two_high_score.text = "Level Two: "
+        self.ids.lvl_three_high_score.text = "Level Three: "
+        self.ids.lvl_four_high_score.text = "Level Four: "
+        self.ids.lvl_five_high_score.text = "Level Five: "
 
 
 class AdminScreen(Screen):
