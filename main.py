@@ -36,6 +36,7 @@ MAIN_SCREEN_NAME = 'main'
 RIGHT_SCREEN_NAME = 'right'
 LEFT_SCREEN_NAME = 'left'
 ADMIN_SCREEN_NAME = 'admin'
+GAME_SCREEN_NAME = 'game'
 
 
 def run_switch():
@@ -126,12 +127,16 @@ def play_sound(action):
 
 
 class MainScreen(Screen):
+    def __init__(self):
+        super(MainScreen, self).__init__()
+
+class GameScreen(Screen):
     """
-    Class to handle the main screen and its associated touch events
+    Class to handle the game screen and its associated touch events
     """
 
     def __init__(self, **kwargs):
-        super(MainScreen, self).__init__(**kwargs)
+        super(GameScreen, self).__init__(**kwargs)
         self.play_video = True
         self.lvl_5_state = 0
         self.capture = load_video_from_start()
@@ -571,6 +576,7 @@ SCREEN_MANAGER.add_widget(MainScreen(name=MAIN_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(RightScreen(name=RIGHT_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(LeftScreen(name=LEFT_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(AdminScreen(name=ADMIN_SCREEN_NAME))
+SCREEN_MANAGER.add_widget(GameScreen(name=GAME_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(PassCodeScreen(name='passCode'))
 
 if __name__ == "__main__":

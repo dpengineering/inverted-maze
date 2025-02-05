@@ -1,4 +1,24 @@
 <MainScreen>:
+on_enter: root.start_video()
+    name: 'main'
+
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1  # Black background color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        size_hint: root.width, root.height
+
+    Image:
+        id: img2
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+
+<GameScreen>:
     on_enter: root.start_video()
     name: 'main'
 
