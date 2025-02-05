@@ -134,10 +134,9 @@ def play_sound(action):
 class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
-        self.startUp()
-        print("please")
+        Clock.schedule_interval(self.startUp, 1.0 / 60.0)
 
-    def startUp(self):
+    def startUp(self, dt):
         global current_screen
         if s.check_button_presses(1):
             SCREEN_MANAGER.transition.direction = "right"
@@ -150,6 +149,7 @@ class MainScreen(Screen):
         if s.check_button_presses(3):
             SCREEN_MANAGER.current = GAME_SCREEN_NAME
             current_screen = 0
+            Clock.unschedule(self.startUp)
 
 
 class GameScreen(Screen):
@@ -195,7 +195,7 @@ class GameScreen(Screen):
         anim3.bind(on_complete=lambda *args: Animation(size_hint=(0.125, 0.125), duration=0.05).start(arrow))
         anim1.bind(on_complete=lambda *args: setattr(self, 'play_video', True))
 
-    def update(self, dt):
+    def update(self, dt = 1.0 / 60.0):
         global level
         if self.play_video:
             if s.check_button_presses(1) and not s.ball_insert:
@@ -644,5 +644,5 @@ SCREEN_MANAGER.add_widget(Instructions(name=INSTRUCTIONS_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(Leaderboard(name=LEADERBOARD_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(PassCodeScreen(name='passCode'))
 
-if __name__ == "__game__":
+if __name__ == "__main__":
     ProjectNameGUI().run()

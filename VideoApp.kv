@@ -1,5 +1,4 @@
 <MainScreen>:
-    on_enter: root.startUp()
     name: 'main'
 
     canvas.before:
@@ -9,7 +8,20 @@
             pos: self.pos
             size: self.size
 
-    Label: #instructions
+    FloatLayout:
+        size_hint: root.width, root.height
+
+    Image:
+        id: img2
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    Image:
+        id: img1
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    DPEAButton: #instructions
         id: info
         color: 0.937, 0.137, 0.235, 1#red
         text: "How to Play"
@@ -20,8 +32,9 @@
         background_normal: ''
         size_hint: None,None
         size: 200, 100
+        on_press: root.startUp()
 
-    Label: #leaderboard
+    DPEAButton: #leaderboard
         id: leaderboard
         color: 0.0156, 0.4, 0.784, 1 #blue
         text: "Leaderboard"
@@ -32,8 +45,9 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
+        on_press: root.startUp()
 
-    Label: #to start
+    DPEAButton: #to start
         id: start_program
         color: 0.066, 0.682, 0.305, 1 #green
         text: "Start"
@@ -44,6 +58,7 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
+        on_press: root.startUp()
 
     Label:
         id: inverted_maze
@@ -323,7 +338,6 @@
         size_hint: None, None
 
 <Instructions>:
-    on_enter: root.home()
     name: 'instructions'
 
     canvas.before:
@@ -332,6 +346,19 @@
         Rectangle:
             pos: self.pos
             size: self.size
+
+    FloatLayout:
+        size_hint: root.width, root.height
+
+    Image:
+        id: img2
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    Image:
+        id: img1
+        size_hint: 1, 1
+        fit_mode: "contain"
 
     Label:
         id: title
@@ -410,7 +437,7 @@
         outline_width: 2
         bold: True
 
-    Label:
+    DPEAButton:
         id: return_home
         color: 0.066, 0.682, 0.305, 1 #green
         text: "Back"
@@ -420,10 +447,11 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
+        on_press: root.home()
 
 
 <Leaderboard>:
-    on_enter: root.fill_high_scores(); root.back_to_home()
+    on_enter: root.fill_high_scores()
     name: 'leaderboard'
 
     canvas.before:
@@ -432,6 +460,20 @@
         Rectangle:
             pos: self.pos
             size: self.size
+
+    FloatLayout:
+        size_hint: root.width, root.height
+
+    Image:
+        id: img2
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    Image:
+        id: img1
+        size_hint: 1, 1
+        fit_mode: "contain"
+
     Label:
         id: the_title
         text: "Leaderboard"
@@ -498,7 +540,7 @@
         outline_width: 2
         bold: True
 
-    Label:
+    DPEAButton:
         id: back_home
         color: 0.066, 0.682, 0.305, 1 #green
         text: "Back"
@@ -508,3 +550,4 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
+        on_press: root.back_to_home()
