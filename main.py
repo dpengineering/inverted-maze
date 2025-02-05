@@ -198,6 +198,7 @@ class GameScreen(Screen):
     def update(self, dt = 1.0 / 60.0):
         global level
         if self.play_video:
+            print("play video")
             if s.check_button_presses(1) and not s.ball_insert:
                 s.level -= 1
                 play_sound("navigate")
