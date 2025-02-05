@@ -195,7 +195,7 @@ class GameScreen(Screen):
         anim3.bind(on_complete=lambda *args: Animation(size_hint=(0.125, 0.125), duration=0.05).start(arrow))
         anim1.bind(on_complete=lambda *args: setattr(self, 'play_video', True))
 
-    def update(self, dt = 1.0 / 60.0):
+    def update(self, dt):
         global level
         if self.play_video:
             print("play video")
