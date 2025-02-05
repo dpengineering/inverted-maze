@@ -3,7 +3,7 @@
 
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 0 # Black background color
+            rgba: 0, 0, 0, 1 # Black background color
         Rectangle:
             pos: self.pos
             size: self.size
@@ -22,7 +22,7 @@
         background_normal: ''
         size_hint: None,None
         size: 200, 100
-        on_press: root.update()
+        on_press: root.switchScreen()
 
     DPEAButton: #leaderboard
         id: leaderboard
@@ -35,7 +35,7 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
-        on_press: root.update()
+        on_press: root.switchScreen()
 
     DPEAButton: #to start
         id: start_program
@@ -48,7 +48,7 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
-        on_press: root.update()
+        on_press: root.switchScreen()
 
     Label:
         id: inverted_maze

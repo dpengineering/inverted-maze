@@ -37,6 +37,8 @@ RIGHT_SCREEN_NAME = 'right'
 LEFT_SCREEN_NAME = 'left'
 ADMIN_SCREEN_NAME = 'admin'
 GAME_SCREEN_NAME = 'game'
+INSTRUCTIONS_SCREEN_NAME = 'instructions'
+LEADERBOARD_SCREEN_NAME = 'leaderboard'
 
 
 def run_switch():
@@ -60,6 +62,9 @@ name_letters = ""
 high_score = HighScore()
 last_name = ''
 auto_switch_screens = None
+current_screen = 0 # home screen
+# 1 = instructions screen
+# 2 = leaderboard screen
 
 SOUND_FILES = {
     "navigate": 'sounds/navigate_sound.wav',
@@ -127,8 +132,22 @@ def play_sound(action):
 
 
 class MainScreen(Screen):
-    def __init__(self):
-        super(MainScreen, self).__init__()
+    def __init__(self, **kwargs):
+        super(MainScreen, self).__init__(**kwargs)
+
+    def switchScreen(self):
+        global current_screen
+        if s.check_button_presses(1):
+            SCREEN_MANAGER.transition.direction = "right"
+            SCREEN_MANAGER.current = INSTRUCTIONS_SCREEN_NAME
+            current_screen = 1
+        if s.check_button_presses(2):
+            SCREEN_MANAGER.transition.direction = "left"
+            SCREEN_MANAGER.current = LEADERBOARD_SCREEN_NAME
+            current_screen = 2
+        if s.check_button_presses(3):
+            SCREEN_MANAGER.current = GAME_SCREEN_NAME
+            return
 
 
 class GameScreen(Screen):
@@ -322,7 +341,7 @@ class RightScreen(Screen):
             Clock.unschedule(self.switch_screen)
             s.reset_button_states()
             SCREEN_MANAGER.transition = NoTransition()
-            SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+            SCREEN_MANAGER.current = GAME_SCREEN_NAME
 
     def start_clock(self):
         global auto_switch_screens
@@ -523,12 +542,8 @@ class Instructions(Screen):
 
     def home(self, dt):
         global current_screen
-        global game_state
-
-        print("home running")
 
         if not current_screen == 1:
-            print("exiting home")
             return
 
         if not self.exit and s.check_button_presses(3):
@@ -536,14 +551,8 @@ class Instructions(Screen):
             SCREEN_MANAGER.transition.direction = "left"
             SCREEN_MANAGER.current = MAIN_SCREEN_NAME
             current_screen = 0
-            game_state = False
 
 class Leaderboard(Screen):
-    # data = {}
-    #
-    # with open('high_scores.json') as f:
-    #     data = json.load(f)
-
     def __init__(self, **kwargs):
         super(Leaderboard, self).__init__(**kwargs)
         self.exit = False
@@ -551,7 +560,6 @@ class Leaderboard(Screen):
 
     def back_to_home(self, dt):
         global current_screen
-        global game_state
 
         if not current_screen == 2:
             return
@@ -560,7 +568,6 @@ class Leaderboard(Screen):
             SCREEN_MANAGER.transition.direction = "right" #right TO left
             SCREEN_MANAGER.current = MAIN_SCREEN_NAME
             current_screen = 0
-            game_state = False
 
     def fill_high_scores(self):
         self.ids.lvl_one_high_score.text = "Level One: "
@@ -586,7 +593,7 @@ class AdminScreen(Screen):
         PassCodeScreen.set_admin_events_screen(
             ADMIN_SCREEN_NAME)  # Specify screen name to transition to after correct password
         PassCodeScreen.set_transition_back_screen(
-            MAIN_SCREEN_NAME)  # set screen name to transition to if "Back to Game is pressed"
+            GAME_SCREEN_NAME)  # set screen name to transition to if "Back to Game is pressed"
 
         super(AdminScreen, self).__init__(**kwargs)
 
@@ -604,7 +611,7 @@ class AdminScreen(Screen):
         Transition back to the main screen
         :return:
         """
-        SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+        SCREEN_MANAGER.current = GAME_SCREEN_NAME
 
     @staticmethod
     def shutdown():
@@ -633,7 +640,9 @@ SCREEN_MANAGER.add_widget(RightScreen(name=RIGHT_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(LeftScreen(name=LEFT_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(AdminScreen(name=ADMIN_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(GameScreen(name=GAME_SCREEN_NAME))
+SCREEN_MANAGER.add_widget(Instructions(name=INSTRUCTIONS_SCREEN_NAME))
+SCREEN_MANAGER.add_widget(Leaderboard(name=LEADERBOARD_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(PassCodeScreen(name='passCode'))
 
-if __name__ == "__main__":
+if __name__ == "__game__":
     ProjectNameGUI().run()
