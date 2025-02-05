@@ -89,7 +89,7 @@ class ProjectNameGUI(App):
         return SCREEN_MANAGER
 
 
-Window.clearcolor = (1, 1, 1, 1)  # White
+Window.clearcolor = (0,0,0,0)  # Black
 
 
 def throttle(wait):
@@ -134,8 +134,10 @@ def play_sound(action):
 class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
+        self.startUp()
+        print("please")
 
-    def switchScreen(self):
+    def startUp(self):
         global current_screen
         if s.check_button_presses(1):
             SCREEN_MANAGER.transition.direction = "right"
@@ -147,7 +149,7 @@ class MainScreen(Screen):
             current_screen = 2
         if s.check_button_presses(3):
             SCREEN_MANAGER.current = GAME_SCREEN_NAME
-            return
+            current_screen = 0
 
 
 class GameScreen(Screen):
@@ -537,7 +539,6 @@ class LeftScreen(Screen):
 class Instructions(Screen):
     def __init__(self, **kwargs):
         super(Instructions, self).__init__(**kwargs)
-        self.exit = False
         Clock.schedule_interval(self.home, 1.0 / 60.0)
 
     def home(self, dt):
@@ -546,7 +547,7 @@ class Instructions(Screen):
         if not current_screen == 1:
             return
 
-        if not self.exit and s.check_button_presses(3):
+        if s.check_button_presses(3):
             print("pressed")
             SCREEN_MANAGER.transition.direction = "left"
             SCREEN_MANAGER.current = MAIN_SCREEN_NAME
@@ -555,7 +556,6 @@ class Instructions(Screen):
 class Leaderboard(Screen):
     def __init__(self, **kwargs):
         super(Leaderboard, self).__init__(**kwargs)
-        self.exit = False
         Clock.schedule_interval(self.back_to_home, 1.0 / 60.0)
 
     def back_to_home(self, dt):
@@ -564,7 +564,7 @@ class Leaderboard(Screen):
         if not current_screen == 2:
             return
 
-        if not self.exit and s.check_button_presses(3):
+        if s.check_button_presses(3):
             SCREEN_MANAGER.transition.direction = "right" #right TO left
             SCREEN_MANAGER.current = MAIN_SCREEN_NAME
             current_screen = 0
