@@ -9,6 +9,7 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.animation import Animation
 from kivy.uix.slider import Slider
+from kivy.uix.button import Button
 from pidev.kivy.PassCodeScreen import PassCodeScreen
 from time import time
 from threading import Thread
@@ -134,6 +135,9 @@ def play_sound(action):
 class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
+        self.startClock()
+
+    def startClock(self):
         Clock.schedule_interval(self.startUp, 1.0 / 60.0)
 
     def startUp(self, dt):
@@ -149,6 +153,7 @@ class MainScreen(Screen):
         if s.check_button_presses(3):
             SCREEN_MANAGER.current = GAME_SCREEN_NAME
             current_screen = 0
+            SCREEN_MANAGER.get_screen(GAME_SCREEN_NAME).setup()
             Clock.unschedule(self.startUp)
 
 
@@ -167,6 +172,9 @@ class GameScreen(Screen):
         self.start_time = 0
         self.start = True
         self.vol = 31
+        self.setup()
+
+    def setup(self):
         Clock.schedule_interval(self.update, 1.0 / 60.0)
 
     def reset_image(self):
@@ -198,13 +206,14 @@ class GameScreen(Screen):
     def update(self, dt):
         global level
         if self.play_video:
-            print("play video")
             if s.check_button_presses(1) and not s.ball_insert:
                 s.level -= 1
                 play_sound("navigate")
             if s.check_button_presses(2) and not s.ball_insert:
                 s.level += 1
                 play_sound("navigate")
+            if s.check_button_presses(3) and not s.ball_insert:
+                self.back_to_main()
             if level > s.level and not s.ball_insert:
                 self.play_video = False
                 self.level_transition("left")
@@ -233,7 +242,7 @@ class GameScreen(Screen):
                                   font_size=125,
                                   size_hint=(None, None),
                                   pos_hint={'center_x': 0.5, 'center_y': 0.5},
-                                  color=(1, 0, 0, 1),
+                                  color=(0.0156, 0.4, 0.784, 1),
                                   outline_color=(1, 1, 1, 1),
                                   outline_width=3,
                                   bold=True
@@ -332,6 +341,14 @@ class GameScreen(Screen):
         s.maze_end_flag = False
         self.reset_image()
         self.play_video = True
+
+    def back_to_main(self):
+        global current_screen
+        SCREEN_MANAGER.transition = NoTransition()
+        SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+        current_screen = 0
+        Clock.unschedule(self.update)
+        SCREEN_MANAGER.get_screen(MAIN_SCREEN_NAME).startClock()
 
 
 class RightScreen(Screen):
@@ -571,11 +588,11 @@ class Leaderboard(Screen):
             current_screen = 0
 
     def fill_high_scores(self):
-        self.ids.lvl_one_high_score.text = "Level One: "
-        self.ids.lvl_two_high_score.text = "Level Two: "
-        self.ids.lvl_three_high_score.text = "Level Three: "
-        self.ids.lvl_four_high_score.text = "Level Four: "
-        self.ids.lvl_five_high_score.text = "Level Five: "
+        self.ids.high_scores.text = "Level One: " + high_score.highest_score(1)
+        self.ids.high_scores.text += "\n\nLevel Two: " + high_score.highest_score(2)
+        self.ids.high_scores.text += "\n\nLevel Three: " + high_score.highest_score(3)
+        self.ids.high_scores.text += "\n\nLevel Four: " + high_score.highest_score(4)
+        self.ids.high_scores.text += "\n\nLevel Five: " + high_score.highest_score(5)
 
 
 class AdminScreen(Screen):

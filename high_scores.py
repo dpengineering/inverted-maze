@@ -28,8 +28,11 @@ class HighScore:
             json.dump(truncated_scores, file)
             # json.dump(self.scores, file)
 
-
     def load_from_json(self):
         with open("high_scores.json", 'r') as file:
             loaded_scores = json.load(file)
             self.scores = {int(level): scores for level, scores in loaded_scores.items()}
+
+    def highest_score(self, level):
+        print(self.scores[level][0])
+        return self.scores[level][0]['name'] + " - " + str(self.scores[level][0]['time'])
