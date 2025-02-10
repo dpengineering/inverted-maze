@@ -21,6 +21,9 @@ import atexit
 from profanity_check import predict
 from kivy.core.audio import SoundLoader
 from pidev.kivy.DPEAButton import DPEAButton
+from kivy.config import Config
+from kivy.uix.button import ButtonBehavior
+from kivy.graphics import Rectangle, Color
 
 
 Window.fullscreen = 'auto'
@@ -90,7 +93,7 @@ class ProjectNameGUI(App):
         return SCREEN_MANAGER
 
 
-Window.clearcolor = (0,0,0,0)  # Black
+Window.clearcolor = (0,0,0,1)  # Black
 
 
 def throttle(wait):
@@ -120,7 +123,6 @@ class CustomSlider(Slider):
             #     print("led")
             #     self.parent.set_led_brightness(self.value)
         return released
-
 
 def load_video_from_start():
     return cv2.VideoCapture(0)
@@ -235,14 +237,14 @@ class GameScreen(Screen):
                 level = s.level % 5
                 if level == 0:
                     level = 5
-                if self.start:  # begin ready go
+                if self.start:  # Begin ready go
                     self.start = False
                     play_sound("ready")
                     label = Label(text='Ready?',
                                   font_size=125,
                                   size_hint=(None, None),
                                   pos_hint={'center_x': 0.5, 'center_y': 0.5},
-                                  color=(0.0156, 0.4, 0.784, 1),
+                                  color=(0.937, 0.137, 0.235, 1),
                                   outline_color=(1, 1, 1, 1),
                                   outline_width=3,
                                   bold=True

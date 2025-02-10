@@ -3,7 +3,7 @@
 
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 0 # Black background color
+            rgba: 0.0, 0.0, 0.0, 1 # Black background color
         Rectangle:
             pos: self.pos
             size: self.size
@@ -21,6 +21,14 @@
         size_hint: 1, 1
         fit_mode: "contain"
 
+    Button:
+        id: background
+        size_hint: root.width*3, root.height*3
+        background_color: 0.969, 0.969, 0.969, 1 #light gray
+        center_x: root.width * 0.4
+        y: root.height * -5
+
+
     DPEAButton: #instructions
         id: info
         color: 0.937, 0.137, 0.235, 1 # red
@@ -32,7 +40,6 @@
         background_normal: ''
         size_hint: None,None
         size: 200, 100
-        on_press: root.startUp()
 
     DPEAButton: #leaderboard
         id: leaderboard
@@ -45,7 +52,6 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
-        on_press: root.startUp()
 
     DPEAButton: #to start
         id: start_program
@@ -58,7 +64,6 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
-        on_press: root.startUp()
 
     Label:
         id: inverted_maze
@@ -78,7 +83,7 @@
 
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 0 # Black background color
+            rgba: 0, 0, 0, 1 # Black background color
         Rectangle:
             pos: self.pos
             size: self.size
@@ -164,15 +169,25 @@
 
     Button:
         id: back_main
-        background_color: 0.066, 0.682, 0.305, 1 #green
+        background_color: 0, 0, 0, 0 #green
+        background_normal: ''
         text: "Back to\nMain Menu"
         font_size: '30sp'
-        center_x: root.width * 0.95
+        outline_color: 0,0,0,1 #black
+        outline_width: 2
+        center_x: root.width * 0.93
         y: root.height * 0.9
         background_normal: ''
         size_hint: None,None
-        size: 200,100
-        on_press: root.back_to_main()
+        size: 250,100
+
+        canvas.before:
+            Color:
+                rgba: (0.066, 0.682, 0.305, 1)
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [10]
 
 
 <LeftScreen>:
@@ -180,11 +195,10 @@
     name: 'left'
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 0  # Black background color
+            rgba: 0, 0, 0, 1  # Black background color
         Rectangle:
             pos: self.pos
             size: self.size
-
 
     FloatLayout:
         size_hint: None, None
@@ -354,7 +368,7 @@
 
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 0 # Black background color
+            rgba: 0, 0, 0, 1 # Black background color
         Rectangle:
             pos: self.pos
             size: self.size
@@ -372,13 +386,20 @@
         size_hint: 1, 1
         fit_mode: "contain"
 
+    Button:
+        id: background
+        size_hint: root.width*3, root.height*3
+        background_color: 0.99, 0.99, 0.99, 1 #light gray
+        center_x: root.width * 0.4
+        y: root.height * -5
+
     Image:
         id: book
-        size_hint: 1, 1
+        size_hint: 1,1
         source: './Images/instruction_book.jpeg'
         size: self.texture_size
-        center_x: root.width * 0.3
-        y: root.height * -0.1
+        center_x: root.width * 0.43
+        y: root.height * -0.35
 
 
     Label:
@@ -394,13 +415,68 @@
 
     Label:
         id: first_sentence
-        text: 'Hello, welcome to the Inverted Maze!\n\nTo play the game, use the handle bars to move the ball in the maze.\nA camera above shows you an overview of the ball, so keep looking at this screen.\nAt the end of each level, record your name by using the buttons.\n\nCan you get the fastest time for each level?\n\nHave fun :)'
+        text: 'Hello, welcome to the Inverted Maze!'
+        font_size: '50sp'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'top': 0.8}
+        color: (0.925, 0.914, 0.961)
+        outline_color: 0, 0, 0, 0
+        outline_width: 2
+        bold: True
+
+    Label:
+        id: first_sentence
+        text: 'To play the game, use the handle bars to move the ball in the maze.'
+        font_size: '50sp'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'top': 0.70}
+        color: (0.925, 0.914, 0.961)
+        outline_color: 0, 0, 0, 0
+        outline_width: 3
+        bold: True
+
+    Label:
+        id: first_sentence
+        text: 'A camera above shows you an overview of the ball, so keep looking at this screen.'
         font_size: '50sp'
         size_hint: (None, None)
         pos_hint: {'center_x': 0.5, 'top': 0.60}
-        color: 0.937, 0.137, 0.235, 1#red
-        outline_color: 1, 1, 1, 1  # White outline color
-        outline_width: 2
+        color: (0.925, 0.914, 0.961)
+        outline_color: 0, 0, 0, 0
+        outline_width: 3
+        bold: True
+
+    Label:
+        id: first_sentence
+        text: 'At the end of each level, record your name by using the buttons.'
+        font_size: '50sp'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'top': 0.50}
+        color: (0.925, 0.914, 0.961)
+        outline_color: 0, 0, 0, 0
+        outline_width: 3
+        bold: True
+
+    Label:
+        id: first_sentence
+        text: 'Can you get the fastest time for each level?'
+        font_size: '50sp'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'top': 0.40}
+        color: (0.925, 0.914, 0.961)
+        outline_color: 0, 0, 0, 0
+        outline_width: 3
+        bold: True
+
+    Label:
+        id: first_sentence
+        text: 'Have fun :)'
+        font_size: '50sp'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'top': 0.30}
+        color: (0.925, 0.914, 0.961)
+        outline_color: 0, 0, 0, 0
+        outline_width: 3
         bold: True
 
     DPEAButton:
@@ -414,7 +490,6 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
-        on_press: root.home()
 
 
 <Leaderboard>:
@@ -440,6 +515,13 @@
         id: img1
         size_hint: 1, 1
         fit_mode: "contain"
+
+    Button:
+        id: background
+        size_hint: root.width*3, root.height*3
+        background_color: 0.969, 0.969, 0.969, 1 #light gray
+        center_x: root.width * 0.4
+        y: root.height * -5
 
     Label:
         id: the_title
@@ -474,4 +556,3 @@
         background_normal: ''
         size_hint: None,None
         size: 200,100
-        on_press: root.back_to_home()

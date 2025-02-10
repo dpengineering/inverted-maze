@@ -76,6 +76,7 @@ class Maze_Server:
         try:
             packet = self.server.recv_packet()
             packet_type = str(packet[0])
+            print(packet)
             if packet_type == "PacketType.COMMAND1":
                 self.but1_state = not self.but1_state
                 self.but1_presses = True
