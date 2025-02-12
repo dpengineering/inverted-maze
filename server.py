@@ -91,6 +91,7 @@ class Maze_Server:
                 print("maze ended")
             elif packet_type == "PacketType.COMMAND5":
                 self.ball_insert = True
+                print("Server - Ball Insert")
             elif packet_type == "PacketType.COMMAND6":
                 print(packet[1].decode('utf-8'))
             elif packet_type == "PacketType.COMMAND7":

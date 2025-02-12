@@ -64,12 +64,14 @@ class Maze_Client:
                 packet_type = str(packet[0])
                 if packet_type == "PacketType.COMMAND1":
                     dpiPowerDrive.switchDriverOnOrOff(0, False)
+                    my_logging.log_to_file("Turn Drive Off")
                 elif packet_type == "PacketType.COMMAND2":
                     vol = int(packet[1].decode('utf-8'))
                     amp.volume = vol
                 elif packet_type == "PacketType.COMMAND3":
                     brightness = int(packet[1].decode('utf-8'))
                     dpiPowerDrive.setDriverPWM(0, brightness)
+                    my_logging.log_to_file("Set Brightness")
 
             except Exception as e:
                 self.client.send_packet(PacketType.RESPONSE_ERROR, bytearray(str(e), 'utf-8'))
@@ -77,6 +79,7 @@ class Maze_Client:
     def button1(self):
         if not dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_0) and not self.button1_pressed:
             self.client.send_packet(PacketType.COMMAND1, b"but1")
+            my_logging.log_to_file("Button 1 Pressed")
             self.button1_pressed = True
             sleep(0.05)
         elif dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_0) and self.button1_pressed:
@@ -85,6 +88,7 @@ class Maze_Client:
     def button2(self):
         if not dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_1) and not self.button2_pressed:
             self.client.send_packet(PacketType.COMMAND2, b"but2")
+            my_logging.log_to_file("Button 2 Pressed")
             self.button2_pressed = True
             sleep(0.05)
         elif dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_1) and self.button2_pressed:
@@ -93,6 +97,8 @@ class Maze_Client:
     def button3(self):
         if not dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_3) and not self.button3_pressed:
             self.client.send_packet(PacketType.COMMAND3, b"but3")
+            my_logging.log_to_file("Button 3 Pressed")
+
             self.button3_pressed = True
             sleep(0.05)
         elif dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_3) and self.button3_pressed:
@@ -104,6 +110,8 @@ class Maze_Client:
 
     def ball_insert(self):
         self.client.send_packet(PacketType.COMMAND5, b'ball_insert')
+        my_logging.log_to_file("Insert Ball")
+
 
     def ping_test(self):
         if not dpiDigitalIn.ping():
