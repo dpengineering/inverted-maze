@@ -11,6 +11,7 @@ import adafruit_max9744
 i2c = busio.I2C(board.SCL, board.SDA)
 amp = adafruit_max9744.MAX9744(i2c)
 amp.volume = 31  # set amp volume
+import my_logging
 
 dpiComputer = DPiComputer()
 dpiPowerDrive = DPiPowerDrive()
@@ -36,7 +37,9 @@ class Maze_Client:
     def __init__(self):
         try:
             self.client = Client("172.17.21.1", 5001, PacketType)
+            my_logging.log_to_file("set client")
             self.client.connect()
+            my_logging.log_to_file("connected")
             dpiComputer.initialize()
             dpiPowerDrive.setBoardNumber(0)
             dpiPowerDrive.initialize()
@@ -45,12 +48,13 @@ class Maze_Client:
             for i in range(16):
                 dpiDigitalIn.setLatchActiveHigh(i)
             dpiDigitalIn.clearAllLatches()
-            print("Client initialized")
+            my_logging.log_to_file("Client initialized")
             self.button1_pressed = False
             self.button2_pressed = False
             self.button3_pressed = False
         except Exception as err:
             print("Client failed to initialize")
+            my_logging.error_to_file("failed to init")
             raise err
 
     def switch(self):

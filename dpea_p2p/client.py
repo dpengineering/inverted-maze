@@ -23,6 +23,7 @@ c.close_connection()
 from .common import *
 import socket
 
+from my_logging import log_to_file
 
 class Client(object):
     """
@@ -37,6 +38,7 @@ class Client(object):
     """
 
     def __init__(self, server_ip, server_port, packet_enum):
+        log_to_file("in init")
         """
         Initializes the client.
 
@@ -63,6 +65,7 @@ class Client(object):
         """
         if self.connection is not None:
             raise RuntimeError("A connection has already been established; use reconnect() to reconnect.")
+        log_to_file("in connect")
         self.reconnect()
 
     def reconnect(self):
@@ -75,13 +78,16 @@ class Client(object):
             except OSError:
                 pass
         self.connection = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
+        log_to_file("connection is set")
         self.connection.connect((self.server_ip, self.server_port))
+        log_to_file("connected")
 
     def close_connection(self):
         """
         Closes the connection to the remote.
         """
         self.connection.close()
+        log_to_file("closed")
 
     # Send/recv
 
