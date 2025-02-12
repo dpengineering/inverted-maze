@@ -107,15 +107,20 @@ class Maze_Client:
 
     def ping_test(self):
         if not dpiDigitalIn.ping():
+            my_logging.log_to_file("comms dpidigitalin failed")
             DDI = "Communication with the DPiDigitalIn board failed."
         else:
             DDI = "Communication with the DPiDigitalIn board succeeded."
+            my_logging.log_to_file("comms dpidigitalin suceeded")
         if not dpiPowerDrive.ping():
             DPD = "Communication with the DPiPowerDrive board failed."
+            my_logging.log_to_file("comms dpidigitalin failed")
         else:
             DPD = "Communication with the DPiPowerDrive board succeeded."
+            my_logging.log_to_file("comms dpidigitalin suceeds")
         payload = (DDI + "\n" + DPD).encode('utf-8')
         self.client.send_packet(PacketType.COMMAND6, payload)
+        my_logging.log_to_file("sent packet")
 
     def return_starting_time(self, time):
         payload = str(time).encode('utf-8')

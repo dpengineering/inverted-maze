@@ -53,6 +53,7 @@ class Server(object):
 
         self.server = None
         self.connection = None
+        print("p2p - init")
 
     # Connection helpers
 
@@ -64,6 +65,7 @@ class Server(object):
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #added to avoid "OSError: [Errno 98] Address already in use"
         self.server.bind((self.bind_ip, self.port))
         self.server.listen(1)
+        print("p2p - open server and listening")
 
     def wait_for_connection(self):
         """
@@ -76,6 +78,7 @@ class Server(object):
         if self.connection is not None:
             raise RuntimeError("A connection has already been established; use reconnect() to reconnect.")
         self.reconnect()
+        print("p2p - runtime error")
 
     def reconnect(self):
         """
@@ -88,18 +91,22 @@ class Server(object):
                 pass
         conn, addr = self.server.accept()
         self.connection = conn
+        print("p2p - reconnect")
 
     def close_connection(self):
         """
         Closes the connection to the client.
         """
         self.connection.close()
+        print("p2p - close conn")
 
     def close_server(self):
         """
         Closes the listening server.
         To reopen the server, call .open_server() again.
         """
+        print("p2p - close server")
+
         self.server.close()
 
     # Send/recv
@@ -112,6 +119,7 @@ class Server(object):
         :param payload: The payload to be sent. Should be a bytes-like object.
         """
         send_packet(self.connection, packet_type, payload)
+        print("p2p - packet send ", payload)
 
     def recv_packet(self):
         """
@@ -119,4 +127,6 @@ class Server(object):
 
         :returns: A tuple of (packet_type, payload) from the server.
         """
+
+        print("p2p - packet send ", self.packet_enum)
         return recv_packet(self.connection, self.packet_enum)

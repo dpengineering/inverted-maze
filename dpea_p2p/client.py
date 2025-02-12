@@ -106,4 +106,5 @@ class Client(object):
 
         :returns: A tuple of (packet_type, payload) from the server.
         """
+        log_to_file('receiving packet')
         return recv_packet(self.connection, self.packet_enum)
