@@ -69,14 +69,15 @@ auto_switch_screens = None
 current_screen = 0 # home screen
 # 1 = instructions screen
 # 2 = leaderboard screen
+start_game = False
 
 SOUND_FILES = {
-    "navigate": 'sounds/navigate_sound.wav',
-    "ready": 'sounds/ready_sound.wav',
-    "go": 'sounds/go_sound.wav',
-    "undo": 'sounds/undo_sound.wav',
-    "select": 'sounds/select_sound.wav',
-    "victory": 'sounds/victory_sound.wav'
+    "navigate": 'assets/sounds/navigate_sound.wav',
+    "ready": 'assets/sounds/ready_sound.wav',
+    "go": 'assets/sounds/go_sound.wav',
+    "undo": 'assets/sounds/undo_sound.wav',
+    "select": 'assets/sounds/select_sound.wav',
+    "victory": 'assets/sounds/victory_sound.wav'
 }
 
 
@@ -144,18 +145,28 @@ class MainScreen(Screen):
 
     def startUp(self, dt):
         global current_screen
+        global start_game
         if s.check_button_presses(1):
+            play_sound("navigate")
             SCREEN_MANAGER.transition.direction = "right"
             SCREEN_MANAGER.current = INSTRUCTIONS_SCREEN_NAME
             current_screen = 1
         if s.check_button_presses(2):
+            play_sound("navigate")
             SCREEN_MANAGER.transition.direction = "left"
             SCREEN_MANAGER.current = LEADERBOARD_SCREEN_NAME
             current_screen = 2
         if s.check_button_presses(3):
+            play_sound("navigate")
             SCREEN_MANAGER.current = GAME_SCREEN_NAME
             current_screen = 0
             SCREEN_MANAGER.get_screen(GAME_SCREEN_NAME).setup()
+            Clock.unschedule(self.startUp)
+        if s.ball_insert:
+            SCREEN_MANAGER.current = GAME_SCREEN_NAME
+            current_screen = 0
+            SCREEN_MANAGER.get_screen(GAME_SCREEN_NAME).setup()
+            start_game = True
             Clock.unschedule(self.startUp)
 
 
@@ -207,6 +218,7 @@ class GameScreen(Screen):
 
     def update(self, dt):
         global level
+        global start_game
         if self.play_video:
             if s.check_button_presses(1) and not s.ball_insert:
                 s.level -= 1
@@ -216,6 +228,7 @@ class GameScreen(Screen):
                 play_sound("navigate")
             if s.check_button_presses(3) and not s.ball_insert:
                 self.back_to_main()
+                play_sound("navigate")
             if level > s.level and not s.ball_insert:
                 self.play_video = False
                 self.level_transition("left")
@@ -233,7 +246,7 @@ class GameScreen(Screen):
                 return
             texture = self.convert_to_texture(frame)
             self.ids.img1.texture = texture
-            if s.ball_insert:
+            if start_game or s.ball_insert:
                 level = s.level % 5
                 if level == 0:
                     level = 5
@@ -271,6 +284,7 @@ class GameScreen(Screen):
                     self.start = True
                     self.play_video = False
                     s.ball_insert = False
+                    start_game = False
                     if high_score.in_top_ten(level, s.maze_time):
                         SCREEN_MANAGER.transition = NoTransition()
                         SCREEN_MANAGER.current = LEFT_SCREEN_NAME
@@ -398,7 +412,7 @@ class RightScreen(Screen):
         for i, score in enumerate(high_score.scores[level]):
             if i <= 9:
                 if score['time'] == s.maze_time:  # highlights last player who played
-                    self.highlight_last_player(y)
+                    self.highlight_last_player(y + 0.023) # magic numbers :D
                 minutes, seconds = divmod(score["time"], 60)
                 if minutes != 0:
                     text = f"{i + 1}. {score['name']} {int(minutes)}:{seconds:05.2f}"
@@ -414,7 +428,7 @@ class RightScreen(Screen):
                     dot_label = self.create_label("...", y, font)
                     self.add_widget(dot_label)
                     self.high_score_animation(dot_label, i + 1)
-                    y -= 0.0625
+                    y -= 0.0625 + 0.02 # magic numbers :D
                     self.highlight_last_player(y)
                     minutes, seconds = divmod(s.maze_time, 60)
                     placement = high_score.get_placement(level, s.maze_time)
@@ -452,9 +466,9 @@ class RightScreen(Screen):
 
     def highlight_last_player(self, y):
         img = Image(
-            source='glow_circle.png',
+            source='assets/glow_circle.png',
             size_hint=(None, None),
-            size=(1000, 100),
+            size=(800, 150),
             allow_stretch=True,
             keep_ratio=False,
             color=(1, 1, 1, 0),
@@ -568,7 +582,7 @@ class Instructions(Screen):
             return
 
         if s.check_button_presses(3):
-            print("pressed")
+            play_sound("navigate")
             SCREEN_MANAGER.transition.direction = "left"
             SCREEN_MANAGER.current = MAIN_SCREEN_NAME
             current_screen = 0
@@ -585,16 +599,17 @@ class Leaderboard(Screen):
             return
 
         if s.check_button_presses(3):
+            play_sound("navigate")
             SCREEN_MANAGER.transition.direction = "right" #right TO left
             SCREEN_MANAGER.current = MAIN_SCREEN_NAME
             current_screen = 0
 
     def fill_high_scores(self):
-        self.ids.high_scores.text = "Level One: " + high_score.highest_score(1)
-        self.ids.high_scores.text += "\n\nLevel Two: " + high_score.highest_score(2)
-        self.ids.high_scores.text += "\n\nLevel Three: " + high_score.highest_score(3)
-        self.ids.high_scores.text += "\n\nLevel Four: " + high_score.highest_score(4)
-        self.ids.high_scores.text += "\n\nLevel Five: " + high_score.highest_score(5)
+        self.ids.high_scores.text = "Level One:     " + high_score.highest_score(1) + " seconds"
+        self.ids.high_scores.text += "\n\nLevel Two:    " + high_score.highest_score(2) + " seconds"
+        self.ids.high_scores.text += "\n\nLevel Three:   " + high_score.highest_score(3) + " seconds"
+        self.ids.high_scores.text += "\n\nLevel Four:   " + high_score.highest_score(4) + " seconds"
+        self.ids.high_scores.text += "\n\nLevel Five:   " + high_score.highest_score(5) + " seconds"
 
 
 class AdminScreen(Screen):
