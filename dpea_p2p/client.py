@@ -23,7 +23,7 @@ c.close_connection()
 from .common import *
 import socket
 
-from my_logging import log_to_file
+from src.my_logging import log_to_file
 
 class Client(object):
     """

@@ -11,7 +11,7 @@ import adafruit_max9744
 i2c = busio.I2C(board.SCL, board.SDA)
 amp = adafruit_max9744.MAX9744(i2c)
 amp.volume = 31  # set amp volume
-import my_logging
+import src.my_logging as my_logging
 
 dpiComputer = DPiComputer()
 dpiPowerDrive = DPiPowerDrive()

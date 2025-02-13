@@ -13,9 +13,9 @@ from kivy.uix.button import Button
 from pidev.kivy.PassCodeScreen import PassCodeScreen
 from time import time
 from threading import Thread
-from server import Maze_Server
+from src.server import Maze_Server
 import subprocess
-from high_scores import HighScore
+from src.scores.score_manager import ScoreManager 
 import cv2
 import atexit
 from profanity_check import predict
@@ -51,7 +51,7 @@ def run_switch():
 
 
 # Runs a shell script on the RPi to copy over and run client file
-client_thread = Thread(target=lambda: subprocess.run('./upload.sh'), daemon=True, name='Client Thread').start()
+client_thread = Thread(target=lambda: subprocess.run('./src/upload.sh'), daemon=True, name='Client Thread').start()
 # Initializes server object which begins connection to client
 s = Maze_Server()
 # Allows the server to continuously receive packages from the client while still having access to Maze_Server functions
@@ -63,7 +63,7 @@ alphabet_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ  "
 abc = 0
 letter = 0
 name_letters = ""
-high_score = HighScore()
+high_score = ScoreManager()
 last_name = ''
 auto_switch_screens = None
 current_screen = 0 # home screen
@@ -608,7 +608,7 @@ class AdminScreen(Screen):
         Lastly super Screen's __init__
         :param kwargs: Normal kivy.uix.screenmanager.Screen attributes
         """
-        Builder.load_file('AdminScreen.kv')
+        Builder.load_file('./src/AdminScreen.kv')
 
         PassCodeScreen.set_admin_events_screen(
             ADMIN_SCREEN_NAME)  # Specify screen name to transition to after correct password
@@ -654,7 +654,7 @@ class AdminScreen(Screen):
 Widget additions
 """
 
-Builder.load_file('VideoApp.kv')
+Builder.load_file('./src/VideoApp.kv')
 SCREEN_MANAGER.add_widget(MainScreen(name=MAIN_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(RightScreen(name=RIGHT_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(LeftScreen(name=LEFT_SCREEN_NAME))

@@ -22,13 +22,13 @@ class ScoreManager:
                 return i+1
 
     def save_to_json(self):
-        with open("high_scores.json", 'w') as file:
+        with open("./src/scores/high_scores.json", 'w') as file:
             truncated_scores = {level: self.scores[level][:3] for level in self.scores}
             json.dump(truncated_scores, file)
             # json.dump(self.scores, file)
 
     def load_from_json(self):
-        with open("high_scores.json", 'r') as file:
+        with open("./src/scores/high_scores.json", 'r') as file:
             loaded_scores = json.load(file)
             self.scores = {int(level): scores for level, scores in loaded_scores.items()}
 
