@@ -1,4 +1,5 @@
 import os
+import time
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.clock import Clock
@@ -79,6 +80,8 @@ SOUND_FILES = {
     "select": 'assets/sounds/select_sound.wav',
     "victory": 'assets/sounds/victory_sound.wav'
 }
+
+Clock.schedule_interval(lambda dt: high_score.reset_json(), 60*60*24*7)
 
 
 class ProjectNameGUI(App):
