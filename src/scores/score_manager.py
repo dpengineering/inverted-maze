@@ -35,3 +35,7 @@ class ScoreManager:
     def highest_score(self, level):
         print(self.scores[level][0])
         return self.scores[level][0]['name'] + " - " + str(self.scores[level][0]['time'])
+    
+    def reset_json(self):
+        self.scores = {"1": [{"name": "JOEY", "time": 12.96}], "2": [{"name": "SAM", "time": 38.83}], "3": [{"name": "AVERY", "time": 101.39}], "4": [{"name": "SACHIN", "time": 31.69}, {"name": "LAUREN", "time": 38.11}, {"name": "SACHIN", "time": 61.93}], "5": [{"name": "STELLAN", "time": 156.89}]}
+        self.save_to_json()

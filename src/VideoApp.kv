@@ -21,62 +21,93 @@
         size_hint: 1, 1
         fit_mode: "contain"
 
-    Button:
-        id: background
-        size_hint: root.width*3, root.height*3
-        background_color: 0.969, 0.969, 0.969, 1 #light gray
-        center_x: root.width * 0.4
-        y: root.height * -5
+    Image:
+        id: maze_bg
+        size_hint: 1,1
+        source: 'assets/invertedmazebg.png'
+        fit_mode: "fill"
+    
+    Image:
+        id: bluebutton
+        size_hint: 0.5, 0.5
+        source: 'assets/bluebutton.png'
+        center_x: root.width * 0.66
+        y: root.height * 0.26
+        fit_mode: "contain"
 
-    DPEAButton: #instructions
+    Image:
+        id: greenbutton
+        size_hint: 0.5, 0.5
+        source: 'assets/greenbutton.png'
+        center_x: root.width * 0.37
+        y: root.height * 0.25
+        fit_mode: "contain"
+
+    Image:
+        id: redbutton
+        size_hint: 0.5, 0.5
+        source: 'assets/redbutton.png'
+        center_x: root.width * 0.10
+        y: root.height * 0.26
+        fit_mode: "contain"
+
+    # Button:
+    #     id: background
+    #     size_hint: root.width*3, root.height*3
+    #     background_color: 0.969, 0.969, 0.969, 1 #light gray
+    #     center_x: root.width * 0.4
+    #     y: root.height * -5
+
+    Button: #instructions
         id: info
-        color: 0.937, 0.137, 0.235, 1 # red
-        text: "How to Play"
+        #color: 0.937, 0.137, 0.235, 1 # red
+        #text: "How to Play"
         font_size: "25sp"
         center_x: root.width * 0.2
-        y: root.height * 0.3
+        y: root.height * 0.45
         background_color: 1,0,0,0
         background_normal: ''
         size_hint: None,None
-        size: 200, 100
+        size: 150, 100
         on_press: root.startUp()
 
-    DPEAButton: #leaderboard
+    Button: #leaderboard
         id: leaderboard
-        color: 0.0156, 0.4, 0.784, 1 # blue
-        text: "Leaderboard"
+        color: 0, 0, 0, 1
+        # color: 0.0156, 0.4, 0.784, 1 # blue
+        # text: "Leaderboard"
         font_size: "25sp"
-        center_x: root.width * 0.8
-        y: root.height * 0.3
+        center_x: root.width * 0.80
+        y: root.height * 0.45
         background_color: 1,0,0,0
         background_normal: ''
         size_hint: None,None
-        size: 200,100
+        size: 150,100
         on_press: root.startUp()
 
-    DPEAButton: #to start
+    Button: #to start
         id: start_program
-        color: 0.066, 0.682, 0.305, 1 # green
-        text: "Start"
+        #color: 0.066, 0.682, 0.305, 1 # green
+        #text: "Start"
         font_size: "25sp"
         center_x: root.width * 0.5
-        y: root.height * 0.3
+        y: root.height * 0.45
         background_color: 1,0,0,0
         background_normal: ''
         size_hint: None,None
-        size: 200,100
+        size: 150,100
         on_press: root.startUp()
 
-    Label:
-        id: inverted_maze
-        text: 'Inverted Maze'
-        font_size: '80sp'
-        size_hint: (None, None)
-        pos_hint: {'center_x': 0.5, 'top': 0.80}
-        color: 1, 1, 1, 1 #White label color
-        outline_color: 0, 0, 0, 1  # Black outline color
-        outline_width: 2
-        bold: True
+    # Label:
+    #     id: inverted_maze
+    #     text: 'Inverted Maze'
+    #     font_size: '80sp'
+    #     size_hint: (None, None)
+    #     pos_hint: {'center_x': 0.5, 'top': 0.80}
+    #     color: 1, 1, 1, 1 #White label color
+    #     outline_color: 0, 0, 0, 1  # Black outline color
+    #     outline_width: 2
+    #     bold: True
 
 
 <GameScreen>:
@@ -236,7 +267,6 @@
         source: 'assets/left_arrow_symbol.png'
         pos_hint: {'center_x': 0.15, 'center_y': 0.3}
 
-
     Label:
         id: letter_1
         text: ''
@@ -393,20 +423,26 @@
         size_hint: 1, 1
         fit_mode: "contain"
 
-    Button:
-        id: background
-        size_hint: root.width*3, root.height*3
-        background_color: 0.99, 0.99, 0.99, 1 #light gray
-        center_x: root.width * 0.4
-        y: root.height * -5
+    Image:
+        id: default_bg
+        size_hint: 1,1
+        source: 'assets/default.jpg'
+        fit_mode: "fill"
+
+    # Button:
+    #     id: background
+    #     size_hint: root.width*3, root.height*3
+    #     background_color: 0.99, 0.99, 0.99, 1 #light gray
+    #     center_x: root.width * 0.4
+    #     y: root.height * -5
 
     Image:
         id: book
         size_hint: 1,1
         source: 'assets/instruction_book.jpeg'
         size: self.texture_size
-        center_x: root.width * 0.43
-        y: root.height * -0.35
+        center_x: root.width * -0.3
+        y: root.height * 0.35
 
 
     Label:
@@ -431,11 +467,19 @@
         outline_color: 0, 0, 0, 0
         outline_width: 2
         bold: True
+    
+    Image:
+        id: greenright
+        size_hint: 0.5, 0.5
+        source: 'assets/greenright.png'
+        center_x: root.width * 0.265
+        y: root.height * -0.075
+        fit_mode: "contain"
 
-    DPEAButton:
+    Button:
         id: return_home
-        color: 0.066, 0.682, 0.305, 1 #green
-        text: "Back"
+        #color: 0.066, 0.682, 0.305, 1 #green
+        #text: "Back"
         font_size: '30sp'
         center_x: root.width * 0.5
         y: root.height * 0.10
@@ -469,13 +513,17 @@
         id: img1
         size_hint: 1, 1
         fit_mode: "contain"
-
-    Button:
-        id: background
-        size_hint: root.width*3, root.height*3
-        background_color: 0.969, 0.969, 0.969, 1 #light gray
-        center_x: root.width * 0.4
-        y: root.height * -5
+    Image:
+        id: default
+        size_hint: 1,1
+        source: 'assets/default.jpg'
+        fit_mode: "fill"
+    # Button:
+    #     id: background
+    #     size_hint: root.width*3, root.height*3
+    #     background_color: 0.969, 0.969, 0.969, 1 #light gray
+    #     center_x: root.width * 0.4
+    #     y: root.height * -5
 
     Label:
         id: the_title
@@ -498,11 +546,19 @@
         outline_color: 1, 1, 1, 1
         outline_width: 2
         bold: True
+    
+    Image:
+        id: greenleft
+        size_hint: 0.5, 0.5
+        source: 'assets/greenleft.png'
+        center_x: root.width * 0.265
+        y: root.height * -0.075
+        fit_mode: "contain"
 
-    DPEAButton:
+    Button:
         id: back_home
-        color: 0.066, 0.682, 0.305, 1 #green
-        text: "Back"
+        #color: 0.066, 0.682, 0.305, 1 #green
+        #text: "Back"
         font_size: '30sp'
         center_x: root.width * 0.5
         y: root.height * 0.10
