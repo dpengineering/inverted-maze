@@ -25,6 +25,7 @@ from pidev.kivy.DPEAButton import DPEAButton
 from kivy.config import Config
 from kivy.uix.button import ButtonBehavior
 from kivy.graphics import Rectangle, Color
+from kivy.core.text import LabelBase
 
 
 Window.fullscreen = 'auto'
@@ -123,9 +124,6 @@ class CustomSlider(Slider):
             if self.my_id == 'vol_slider':
                 print("vol")
                 self.parent.set_volume(self.value)
-            # elif self.my_id == 'led_slider':
-            #     print("led")
-            #     self.parent.set_led_brightness(self.value)
         return released
 
 def load_video_from_start():
@@ -161,6 +159,7 @@ class MainScreen(Screen):
             current_screen = 2
         if s.check_button_presses(3):
             play_sound("navigate")
+            SCREEN_MANAGER.transition = NoTransition()
             SCREEN_MANAGER.current = GAME_SCREEN_NAME
             current_screen = 0
             SCREEN_MANAGER.get_screen(GAME_SCREEN_NAME).setup()
@@ -200,7 +199,7 @@ class GameScreen(Screen):
         self.ids.img2.texture = texture
 
     def level_transition(self, direction):
-        anim3 = Animation(size_hint=(0.115, 0.115), duration=0.05)
+        anim3 = Animation(size_hint=(0.325, 0.325), duration=0.05)
         if direction == "left":
             arrow = self.ids.left_arrow_symbol
             setattr(self.ids.img1, 'x', -1920)
@@ -216,7 +215,7 @@ class GameScreen(Screen):
         anim1.start(self.ids.img1)
         anim2.start(self.ids.img2)
         anim3.start(arrow)
-        anim3.bind(on_complete=lambda *args: Animation(size_hint=(0.125, 0.125), duration=0.05).start(arrow))
+        anim3.bind(on_complete=lambda *args: Animation(size_hint=(0.35, 0.35), duration=0.05).start(arrow))
         anim1.bind(on_complete=lambda *args: setattr(self, 'play_video', True))
 
     def update(self, dt):
@@ -258,6 +257,7 @@ class GameScreen(Screen):
                     play_sound("ready")
                     label = Label(text='Ready?',
                                   font_size=125,
+                                  font_name='PixelifySans',
                                   size_hint=(None, None),
                                   pos_hint={'center_x': 0.5, 'center_y': 0.5},
                                   color=(0.937, 0.137, 0.235, 1),
@@ -281,6 +281,7 @@ class GameScreen(Screen):
                 self.ids.insert_label.text = ''
                 self.ids.right_arrow_symbol.color = (1, 1, 1, 0)
                 self.ids.left_arrow_symbol.color = (1, 1, 1, 0)
+                self.ids.backarrow.color = (1, 1, 1, 0)
                 if s.maze_end_flag:
                     play_sound("victory")
                     self.timer = False
@@ -294,13 +295,6 @@ class GameScreen(Screen):
                     else:
                         SCREEN_MANAGER.transition = NoTransition()
                         SCREEN_MANAGER.current = RIGHT_SCREEN_NAME
-
-    # def red_button(self):  # temp kivy button
-    #     s.but1_presses = True
-    #
-    # def blue_button(self):  # temp kivy button
-    #     SCREEN_MANAGER.transition = NoTransition()
-    #     SCREEN_MANAGER.current = RIGHT_SCREEN_NAME
 
     def convert_to_texture(self, frame):
         global level
@@ -356,6 +350,7 @@ class GameScreen(Screen):
         self.ids.time_label.text = ''
         self.ids.right_arrow_symbol.color = (1, 1, 1, 1)
         self.ids.left_arrow_symbol.color = (1, 1, 1, 1)
+        self.ids.backarrow.color = (1, 1, 1, 1)
         s.ball_insert = False
         s.maze_end_flag = False
         self.reset_image()
@@ -378,9 +373,11 @@ class RightScreen(Screen):
             self.clear_widgets()
             Clock.unschedule(auto_switch_screens)
             Clock.unschedule(self.switch_screen)
-            s.reset_button_states()
+            global current_screen
             SCREEN_MANAGER.transition = NoTransition()
-            SCREEN_MANAGER.current = GAME_SCREEN_NAME
+            SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+            current_screen = 0
+            SCREEN_MANAGER.get_screen(MAIN_SCREEN_NAME).startClock()
 
     def start_clock(self):
         global auto_switch_screens
@@ -396,6 +393,7 @@ class RightScreen(Screen):
         global level
         self.add_widget(Label(
             text=f'Level {level} High Scores',
+            font_name= 'PixelifySans',
             font_size=75,
             size_hint=(None, None),
             pos_hint={'center_x': 0.5, 'top': 0.95},
@@ -445,6 +443,7 @@ class RightScreen(Screen):
                 break
         self.add_widget(Label(
             text="press any button to continue",
+            font_name= 'PixelifySans',
             pos_hint={'center_x': 0.5, 'top': 0.1},
             size_hint=(None, None),
             color=(1, 0, 0, 1),
@@ -460,6 +459,7 @@ class RightScreen(Screen):
             pos_hint={'top': y},
             pos=(960 * 3, 0),
             size_hint=(None, None),
+            font_name= 'PixelifySans',
             color=(1, 0, 0, 1),
             outline_color=(1, 1, 1, 1),
             outline_width=3,
@@ -493,13 +493,13 @@ class LeftScreen(Screen):
         Clock.schedule_interval(self.change_letter, 1.0 / 30.0)
 
     def arrow_animation(self, direction):
-        anim = Animation(size_hint=(0.115, 0.115), duration=0.05)
+        anim = Animation(size_hint=(0.325, 0.325), duration=0.05)
         if direction == "left":
             arrow = self.ids.left_arrow_symbol
         if direction == "right":
             arrow = self.ids.right_arrow_symbol
         anim.start(arrow)
-        anim.bind(on_complete=lambda *args: Animation(size_hint=(0.125, 0.125), duration=0.05).start(arrow))
+        anim.bind(on_complete=lambda *args: Animation(size_hint=(0.35, 0.35), duration=0.05).start(arrow))
 
     def change_letter(self, dt):
         global alphabet_list, abc, letter, name_letters, level
@@ -541,23 +541,23 @@ class LeftScreen(Screen):
         enter = self.ids.img2
         backspace = self.ids.img3
         if abc % 28 == 1:  # enter symbol is far left bs is offscreen
-            self.update_img_pos(enter, .3, .5, .135)
+            self.update_img_pos(enter, .3, .5, .265)
             self.update_img_pos(backspace, 0, 0, 0)
         elif abc % 28 == 0:  # enter symbol is on the mid left bs is far left
-            self.update_img_pos(enter, .4, .75, .15)
-            self.update_img_pos(backspace, .29, .5, .135)
+            self.update_img_pos(enter, .4, .75, .265)
+            self.update_img_pos(backspace, .29, .5, .265)
         elif abc % 28 == 27:  # enter symbol is in the middle
-            self.update_img_pos(enter, .5, 1, .165)
-            self.update_img_pos(backspace, .39, .75, .15)
+            self.update_img_pos(enter, .5, 1, .265)
+            self.update_img_pos(backspace, .39, .75, .265)
         elif abc % 28 == 26:  # enter symbol is on the mid right
-            self.update_img_pos(enter, .6, .75, .15)
-            self.update_img_pos(backspace, .49, 1, .165)
+            self.update_img_pos(enter, .6, .75, .265)
+            self.update_img_pos(backspace, .49, 1, .265)
         elif abc % 28 == 25:  # enter symbol is on the far right
-            self.update_img_pos(enter, .7, .5, .135)
-            self.update_img_pos(backspace, .59, .75, .15)
+            self.update_img_pos(enter, .7, .5, .265)
+            self.update_img_pos(backspace, .59, .75, .265)
         elif abc % 28 == 24:  # backspace symbol is on the far right
             self.update_img_pos(enter, 0, 0, 0)
-            self.update_img_pos(backspace, .69, .5, .135)
+            self.update_img_pos(backspace, .69, .5, .265)
         else:
             self.update_img_pos(enter, 0, 0, 0)  # both offscreen
             self.update_img_pos(backspace, 0, 0, 0)
@@ -568,6 +568,8 @@ class LeftScreen(Screen):
         self.ids.letter_5.text = alphabet_list[(abc + 2) % 28]
 
     def update_img_pos(self, img, x_pos, opacity, size_hint):
+        if img == self.ids.img3:
+            x_pos += 0.02
         img.pos_hint = {"center_x": x_pos}
         img.color = 1, 1, 1, opacity
         img.size_hint = (size_hint, size_hint)
@@ -609,10 +611,10 @@ class Leaderboard(Screen):
 
     def fill_high_scores(self):
         self.ids.high_scores.text = "Level One:     " + high_score.highest_score(1) + " seconds"
-        self.ids.high_scores.text += "\n\nLevel Two:    " + high_score.highest_score(2) + " seconds"
-        self.ids.high_scores.text += "\n\nLevel Three:   " + high_score.highest_score(3) + " seconds"
-        self.ids.high_scores.text += "\n\nLevel Four:   " + high_score.highest_score(4) + " seconds"
-        self.ids.high_scores.text += "\n\nLevel Five:   " + high_score.highest_score(5) + " seconds"
+        self.ids.high_scores.text += "\nLevel Two:    " + high_score.highest_score(2) + " seconds"
+        self.ids.high_scores.text += "\nLevel Three:   " + high_score.highest_score(3) + " seconds"
+        self.ids.high_scores.text += "\nLevel Four:   " + high_score.highest_score(4) + " seconds"
+        self.ids.high_scores.text += "\nLevel Five:   " + high_score.highest_score(5) + " seconds"
 
 
 class AdminScreen(Screen):
@@ -683,4 +685,5 @@ SCREEN_MANAGER.add_widget(Leaderboard(name=LEADERBOARD_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(PassCodeScreen(name='passCode'))
 
 if __name__ == "__main__":
+    LabelBase.register(name='PixelifySans', fn_regular='/home/soft-dev/Documents/Inverted-Maze/assets/Pixelify_Sans/PixelifySans-VariableFont_wght.ttf')
     ProjectNameGUI().run()
