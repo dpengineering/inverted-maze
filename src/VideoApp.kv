@@ -1,6 +1,5 @@
 <MainScreen>:
     name: 'main'
-
     canvas.before:
         Color:
             rgba: 0.0, 0.0, 0.0, 1 # Black background color
@@ -10,6 +9,10 @@
 
     FloatLayout:
         size_hint: root.width, root.height
+
+    ####################
+    ##### IMAGES #######
+    ####################
 
     Image:
         id: img2
@@ -50,6 +53,10 @@
         center_x: root.width * 0.1
         y: root.height * 0.2725
         fit_mode: "contain"
+
+    ####################
+    ##### BUTTONS ######
+    ####################
 
     Button: #instructions
         id: info
