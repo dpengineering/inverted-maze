@@ -1,7 +1,6 @@
 import json
 
-
-class HighScore:
+class ScoreManager:
     def __init__(self):
         self.scores = {level: [] for level in range(1, 6)}
         self.load_from_json()
@@ -23,13 +22,20 @@ class HighScore:
                 return i+1
 
     def save_to_json(self):
-        with open("high_scores.json", 'w') as file:
+        with open("./src/scores/high_scores.json", 'w') as file:
             truncated_scores = {level: self.scores[level][:3] for level in self.scores}
             json.dump(truncated_scores, file)
             # json.dump(self.scores, file)
 
-
     def load_from_json(self):
-        with open("high_scores.json", 'r') as file:
+        with open("./src/scores/high_scores.json", 'r') as file:
             loaded_scores = json.load(file)
             self.scores = {int(level): scores for level, scores in loaded_scores.items()}
+
+    def highest_score(self, level):
+        print(self.scores[level][0])
+        return self.scores[level][0]['name'] + " - " + str(self.scores[level][0]['time'])
+    
+    def reset_json(self):
+        self.scores = {1: [{"name": "CINDY", "time": 15.96}], 2: [{"name": "LAUREN", "time": 21.83}], 3: [{"name": "AAYUSH", "time": 29.39}], 4: [{"name": "JOEY", "time": 31.69}], 5: [{"name": "SACHIN", "time": 56.89}]}
+        self.save_to_json()

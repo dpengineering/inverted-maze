@@ -1,0 +1,515 @@
+<MainScreen>:
+    name: 'main'
+    canvas.before:
+        Color:
+            rgba: 0.0, 0.0, 0.0, 1 # Black background color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        size_hint: root.width, root.height
+
+    ####################
+    ##### IMAGES #######
+    ####################
+
+    Image:
+        id: img2
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    Image:
+        id: img1
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    Image:
+        id: maze_bg
+        size_hint: 1,1
+        source: 'assets/IMBG.png'
+        fit_mode: "fill"
+    
+    Image:
+        id: bluebutton
+        size_hint: 0.5, 0.5
+        source: 'assets/bluebutton.png'
+        center_x: root.width * 0.6325
+        y: root.height * 0.2725
+        fit_mode: "contain"
+
+    Image:
+        id: greenbutton
+        size_hint: 0.5, 0.5
+        source: 'assets/greenbutton.png'
+        center_x: root.width * 0.36625
+        y: root.height * 0.2575
+        fit_mode: "contain"
+
+    Image:
+        id: redbutton
+        size_hint: 0.5, 0.5
+        source: 'assets/redbutton.png'
+        center_x: root.width * 0.1
+        y: root.height * 0.2725
+        fit_mode: "contain"
+
+    ####################
+    ##### BUTTONS ######
+    ####################
+
+    Button: #instructions
+        id: info
+        #color: 0.937, 0.137, 0.235, 1 # red
+        #text: "How to Play"
+        font_size: "25sp"
+        center_x: root.width * 0.2
+        y: root.height * 0.45
+        background_color: 1,0,0,0
+        background_normal: ''
+        size_hint: None,None
+        size: 150, 100
+        on_press: root.startUp()
+
+    Button: #leaderboard
+        id: leaderboard
+        color: 0, 0, 0, 1
+        # color: 0.0156, 0.4, 0.784, 1 # blue
+        # text: "Leaderboard"
+        font_size: "25sp"
+        center_x: root.width * 0.80
+        y: root.height * 0.45
+        background_color: 1,0,0,0
+        background_normal: ''
+        size_hint: None,None
+        size: 150,100
+        on_press: root.startUp()
+
+    Button: #to start
+        id: start_program
+        #color: 0.066, 0.682, 0.305, 1 # green
+        #text: "Start"
+        font_size: "25sp"
+        center_x: root.width * 0.5
+        y: root.height * 0.45
+        background_color: 1,0,0,0
+        background_normal: ''
+        size_hint: None,None
+        size: 150,100
+        on_press: root.startUp()
+
+<GameScreen>:
+    on_enter: root.start_video()
+    name: 'game'
+
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1 # Black background color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        size_hint: root.width, root.height
+
+    Image:
+        id: img2
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    Image:
+        id: img1
+        size_hint: 1, 1
+        fit_mode: "contain"
+    
+    Image:
+        id: backarrow
+        size_hint: (0.35, 0.35)
+        source: 'assets/backarrow.png'
+        center_x: root.width * 0.765
+        y: root.height * 0.73
+        fit_mode: "contain"
+
+    Button:
+        id: temp_but_2
+        font_size: self.width * .3
+        text: '>'
+        size_hint: .1, .1
+        pos_hint: {"center_x": 1, "center_y":0}
+        color: 0, 0, 1, 0
+        opacity: 0
+        on_press: root.admin_action()
+
+    Label:
+        id: level_label
+        text: '' #'Level 1'
+        font_size: '65sp'
+        font_name: 'PixelifySans' 
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.07, 'top': 0.95}
+        color: 0.937, 0.137, 0.235, 1#red
+        outline_color: 1, 1, 1, 1  # White outline color
+        outline_width: 2
+        bold: True
+
+    Image:
+        id: right_arrow_symbol
+        size_hint: (0.35, 0.35)
+        source: 'assets/bluebutton.png'
+        pos_hint: {'center_x': 0.93, 'center_y': 0.495}
+
+    Image:
+        id: left_arrow_symbol
+        size_hint: (0.35, 0.35)
+        source: 'assets/redbutton.png'
+        pos_hint: {'center_x': 0.07, 'center_y': 0.495}
+
+    Label:
+        id: insert_label
+        text: ''
+        font_size: '65sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'top': 0.95}
+        color: 0.937, 0.137, 0.235, 1#red
+        outline_color: 1, 1, 1, 1  # White outline color
+        outline_width: 3
+
+    Label:
+        id: time_label
+        text: ''
+        font_size: '65sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.07, 'top': 0.95}
+        color: 0.937, 0.137, 0.235, 1#red
+        outline_color: 1, 1, 1, 1  # White outline color
+        outline_width: 2
+        bold: True
+
+    Label:
+        id: vol_label
+        text: ''
+        font_size: '50sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.93, 'top': 0.1}
+        color: 0.937, 0.137, 0.235, 1#red
+        outline_color: 1, 1, 1, 1  # White outline color
+        outline_width: 2
+        bold: True
+
+    Button:
+        id: back_main
+        background_color: 0, 0, 0, 0
+        color: 0, 0, 0, 0
+        center_x: root.width * 0.93
+        y: root.height * 0.9
+        on_press: root.back_to_main()
+
+<LeftScreen>:
+    on_enter: root.start_clock()
+    name: 'left'
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1  # Black background color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        size_hint: None, None
+
+    Image:
+        id: img2
+        size_hint: (0.325, 0.325)
+        source: 'assets/backarrow.png'
+        pos_hint: {'center_x': .5, 'center_y': .335}
+        color: 1, 1, 1, 0.75
+
+    Image:
+        id: img3
+        size_hint: (0.325, 0.325)
+        source: 'assets/delete_button.png'
+        pos_hint: {'center_x': .5, 'center_y': .35}
+        color: 1, 1, 1, .5
+
+    Image:
+        id: right_arrow_symbol
+        size_hint: (0.35, 0.35)
+        source: 'assets/bluebutton.png'
+        pos_hint: {'center_x': 0.85, 'center_y': 0.3}
+
+    Image:
+        id: left_arrow_symbol
+        size_hint: (0.35, 0.35)
+        source: 'assets/redbutton.png'
+        pos_hint: {'center_x': 0.15, 'center_y': 0.3}
+
+    Label:
+        id: letter_1
+        text: ''
+        font_size: '144sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.4, 'top': 0.35}
+        color: 0.937, 0.137, 0.235, 1#red
+        outline_color: 1, 1, 1, 0.75  # White outline color
+        outline_width: 4
+        bold: True
+
+    Label:
+        id: letter_2
+        text: 'A'
+        font_size: '180sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'top': 0.35}
+        color: 1, 0, 0, 1
+        outline_color: 1, 1, 1, 1
+        outline_width: 4
+        bold: True
+
+    Label:
+        id: letter_3
+        text: 'B'
+        font_size: '144sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.6, 'top': 0.35}
+        color: 1, 0, 0, 0.75
+        outline_color: 1, 1, 1, 0.75
+        outline_width: 4
+        bold: True
+
+    Label:
+        id: letter_4
+        text: ''
+        font_size: '115.2sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.3, 'top': 0.35}
+        color: 1, 0, 0, 0.5
+        outline_color: 1, 1, 1, 0.5
+        outline_width: 4
+        bold: True
+
+    Label:
+        id: letter_5
+        text: 'C'
+        font_size: '115.2sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.7, 'top': 0.35}
+        color: 1, 0, 0, 0.5
+        outline_color: 1, 1, 1, 0.5
+        outline_width: 4
+        bold: True
+
+    Label:
+        id: pos_marker
+        text: '^'
+        font_size: '160sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'center_y': 0.15}
+        color: 1, 0, 0, 1
+        outline_color: 1, 1, 1, 1
+        outline_width: 2
+        bold: True
+
+    Label:
+        id: controls_label
+        text: 'select      symbol when you are done'
+        font_size: '50sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': .5, 'center_y': .1}
+        color: 1, 0, 0, 1
+        outline_color: 1, 1, 1, 1
+        outline_width: 2
+        bold: True
+
+    Image:
+        id: label_e_symbol
+        size_hint: (0.1, 0.1)
+        source: 'assets/backarrow.png'
+        pos_hint: {'center_x': .38, 'center_y': .1}
+        color: 1, 1, 1, 1
+
+    Label:
+        id: score_label
+        text: 'Enter your name'
+        font_size: '50sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': .5, "center_y":0.75}
+        color: 0.937, 0.137, 0.235, 1#red
+        outline_color: 1, 1, 1, 1  # White outline color
+        outline_width: 2
+        bold: True
+
+    Label:
+        id: name_label
+        text: ''
+        font_size: '75sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': .5, "center_y":0.5}
+        color: 0.937, 0.137, 0.235, 1#red
+        outline_color: 1, 1, 1, 1  # White outline color
+        outline_width: 2
+        bold: True
+
+    Label:
+        id: time_label
+        text: ''
+        font_size: '50sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': .5, "center_y":0.85}
+        color: 0.937, 0.137, 0.235, 1#red
+        outline_color: 1, 1, 1, 1  # White outline color
+        outline_width: 2
+        bold: True
+
+
+
+<RightScreen>:
+    on_enter: root.update_high_scores(); root.start_clock()
+    name: 'right'
+
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1  # Black background color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        size_hint: None, None
+
+<Instructions>:
+    name: 'instructions'
+
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1 # Black background color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        size_hint: root.width, root.height
+
+    Image:
+        id: img2
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    Image:
+        id: img1
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    Image:
+        id: default_bg
+        size_hint: 1,1
+        source: 'assets/instructions.png'
+        fit_mode: "fill"
+
+    Label:
+        id: sentences
+        text: 'Hello, welcome to the Inverted Maze!\n1. Put a ball in the entrance\n2. Use the handles to move the ball\n3. Enter your name with the buttons\nCan you get the fastest time for each level?'
+        font_size: '65sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'top': 0.525}
+        color: 0.937, 0.137, 0.235, 1 #red
+        outline_color: 1, 1, 1, 1
+        outline_width: 0
+        bold: True
+
+    Image:
+        id: greenright
+        size_hint: 0.35, 0.35
+        source: 'assets/greenright.png'
+        center_x: root.width * 0.335
+        y: root.height * -0.03
+        fit_mode: "contain"
+
+    Button:
+        id: return_home
+        #color: 0.066, 0.682, 0.305, 1 #green
+        #text: "Back"
+        font_size: '30sp'
+        center_x: root.width * 0.5
+        y: root.height * 0.10
+        background_color: 1,0,0,0
+        background_normal: ''
+        size_hint: None,None
+        size: 200,100
+        on_press: root.home()
+
+
+<Leaderboard>:
+    on_enter: root.fill_high_scores()
+    name: 'leaderboard'
+
+    canvas.before:
+        Color:
+            rgba: 0,0,0,0  # White background color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    FloatLayout:
+        size_hint: root.width, root.height
+
+    Image:
+        id: img2
+        size_hint: 1, 1
+        fit_mode: "contain"
+
+    Image:
+        id: img1
+        size_hint: 1, 1
+        fit_mode: "contain"
+    Image:
+        id: default
+        size_hint: 1,1
+        source: 'assets/leaderboard.png'
+        fit_mode: "fill"
+
+    Label:
+        id: high_scores
+        text: ''
+        font_size: '65sp'
+        font_name: 'PixelifySans'
+        size_hint: (None, None)
+        pos_hint: {'center_x': 0.5, 'top': 0.525}
+        color: 0.937, 0.137, 0.235, 1 #red
+        outline_color: 1, 1, 1, 1
+        outline_width: 0
+        bold: True
+    
+    Image:
+        id: greenleft
+        size_hint: 0.35, 0.35
+        source: 'assets/greenleft.png'
+        center_x: root.width * 0.335
+        y: root.height * -0.03
+        fit_mode: "contain"
+
+    Button:
+        id: back_home
+        #color: 0.066, 0.682, 0.305, 1 #green
+        #text: "Back"
+        font_size: '30sp'
+        center_x: root.width * 0.5
+        y: root.height * 0.10
+        background_color: 1,0,0,0
+        background_normal: ''
+        size_hint: None,None
+        size: 1,1
+        on_press: root.back_to_home()

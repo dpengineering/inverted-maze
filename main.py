@@ -1,4 +1,5 @@
 import os
+import time
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.clock import Clock
@@ -9,17 +10,22 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.animation import Animation
 from kivy.uix.slider import Slider
+from kivy.uix.button import Button
 from pidev.kivy.PassCodeScreen import PassCodeScreen
 from time import time
 from threading import Thread
-from server import Maze_Server
+from src.server import Maze_Server
 import subprocess
-from high_scores import HighScore
+from src.scores.score_manager import ScoreManager 
 import cv2
 import atexit
 from profanity_check import predict
 from kivy.core.audio import SoundLoader
 from pidev.kivy.DPEAButton import DPEAButton
+from kivy.config import Config
+from kivy.uix.button import ButtonBehavior
+from kivy.graphics import Rectangle, Color
+from kivy.core.text import LabelBase
 
 
 Window.fullscreen = 'auto'
@@ -36,6 +42,9 @@ MAIN_SCREEN_NAME = 'main'
 RIGHT_SCREEN_NAME = 'right'
 LEFT_SCREEN_NAME = 'left'
 ADMIN_SCREEN_NAME = 'admin'
+GAME_SCREEN_NAME = 'game'
+INSTRUCTIONS_SCREEN_NAME = 'instructions'
+LEADERBOARD_SCREEN_NAME = 'leaderboard'
 
 
 def run_switch():
@@ -44,7 +53,7 @@ def run_switch():
 
 
 # Runs a shell script on the RPi to copy over and run client file
-client_thread = Thread(target=lambda: subprocess.run('./upload.sh'), daemon=True, name='Client Thread').start()
+client_thread = Thread(target=lambda: subprocess.run('./src/upload.sh'), daemon=True, name='Client Thread').start()
 # Initializes server object which begins connection to client
 s = Maze_Server()
 # Allows the server to continuously receive packages from the client while still having access to Maze_Server functions
@@ -56,18 +65,24 @@ alphabet_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ  "
 abc = 0
 letter = 0
 name_letters = ""
-high_score = HighScore()
+high_score = ScoreManager()
 last_name = ''
 auto_switch_screens = None
+current_screen = 0 # home screen
+# 1 = instructions screen
+# 2 = leaderboard screen
+start_game = False
 
 SOUND_FILES = {
-    "navigate": 'sounds/navigate_sound.wav',
-    "ready": 'sounds/ready_sound.wav',
-    "go": 'sounds/go_sound.wav',
-    "undo": 'sounds/undo_sound.wav',
-    "select": 'sounds/select_sound.wav',
-    "victory": 'sounds/victory_sound.wav'
+    "navigate": 'assets/sounds/navigate_sound.wav',
+    "ready": 'assets/sounds/ready_sound.wav',
+    "go": 'assets/sounds/go_sound.wav',
+    "undo": 'assets/sounds/undo_sound.wav',
+    "select": 'assets/sounds/select_sound.wav',
+    "victory": 'assets/sounds/victory_sound.wav'
 }
+
+Clock.schedule_interval(lambda dt: high_score.reset_json(), 60*60*24*7)
 
 
 class ProjectNameGUI(App):
@@ -83,7 +98,7 @@ class ProjectNameGUI(App):
         return SCREEN_MANAGER
 
 
-Window.clearcolor = (1, 1, 1, 1)  # White
+Window.clearcolor = (0,0,0,1)  # Black
 
 
 def throttle(wait):
@@ -109,11 +124,7 @@ class CustomSlider(Slider):
             if self.my_id == 'vol_slider':
                 print("vol")
                 self.parent.set_volume(self.value)
-            # elif self.my_id == 'led_slider':
-            #     print("led")
-            #     self.parent.set_led_brightness(self.value)
         return released
-
 
 def load_video_from_start():
     return cv2.VideoCapture(0)
@@ -126,12 +137,48 @@ def play_sound(action):
 
 
 class MainScreen(Screen):
+    def __init__(self, **kwargs):
+        super(MainScreen, self).__init__(**kwargs)
+        self.startClock()
+
+    def startClock(self):
+        Clock.schedule_interval(self.startUp, 1.0 / 60.0)
+
+    def startUp(self, dt):
+        global current_screen
+        global start_game
+        if s.check_button_presses(1):
+            play_sound("navigate")
+            SCREEN_MANAGER.transition.direction = "right"
+            SCREEN_MANAGER.current = INSTRUCTIONS_SCREEN_NAME
+            current_screen = 1
+        if s.check_button_presses(2):
+            play_sound("navigate")
+            SCREEN_MANAGER.transition.direction = "left"
+            SCREEN_MANAGER.current = LEADERBOARD_SCREEN_NAME
+            current_screen = 2
+        if s.check_button_presses(3):
+            play_sound("navigate")
+            SCREEN_MANAGER.transition = NoTransition()
+            SCREEN_MANAGER.current = GAME_SCREEN_NAME
+            current_screen = 0
+            SCREEN_MANAGER.get_screen(GAME_SCREEN_NAME).setup()
+            Clock.unschedule(self.startUp)
+        if s.ball_insert:
+            SCREEN_MANAGER.current = GAME_SCREEN_NAME
+            current_screen = 0
+            SCREEN_MANAGER.get_screen(GAME_SCREEN_NAME).setup()
+            start_game = True
+            Clock.unschedule(self.startUp)
+
+
+class GameScreen(Screen):
     """
-    Class to handle the main screen and its associated touch events
+    Class to handle the game screen and its associated touch events
     """
 
     def __init__(self, **kwargs):
-        super(MainScreen, self).__init__(**kwargs)
+        super(GameScreen, self).__init__(**kwargs)
         self.play_video = True
         self.lvl_5_state = 0
         self.capture = load_video_from_start()
@@ -140,6 +187,9 @@ class MainScreen(Screen):
         self.start_time = 0
         self.start = True
         self.vol = 31
+        self.setup()
+
+    def setup(self):
         Clock.schedule_interval(self.update, 1.0 / 60.0)
 
     def reset_image(self):
@@ -149,7 +199,7 @@ class MainScreen(Screen):
         self.ids.img2.texture = texture
 
     def level_transition(self, direction):
-        anim3 = Animation(size_hint=(0.115, 0.115), duration=0.05)
+        anim3 = Animation(size_hint=(0.325, 0.325), duration=0.05)
         if direction == "left":
             arrow = self.ids.left_arrow_symbol
             setattr(self.ids.img1, 'x', -1920)
@@ -165,17 +215,21 @@ class MainScreen(Screen):
         anim1.start(self.ids.img1)
         anim2.start(self.ids.img2)
         anim3.start(arrow)
-        anim3.bind(on_complete=lambda *args: Animation(size_hint=(0.125, 0.125), duration=0.05).start(arrow))
+        anim3.bind(on_complete=lambda *args: Animation(size_hint=(0.35, 0.35), duration=0.05).start(arrow))
         anim1.bind(on_complete=lambda *args: setattr(self, 'play_video', True))
 
     def update(self, dt):
         global level
+        global start_game
         if self.play_video:
             if s.check_button_presses(1) and not s.ball_insert:
                 s.level -= 1
                 play_sound("navigate")
             if s.check_button_presses(2) and not s.ball_insert:
                 s.level += 1
+                play_sound("navigate")
+            if s.check_button_presses(3) and not s.ball_insert:
+                self.back_to_main()
                 play_sound("navigate")
             if level > s.level and not s.ball_insert:
                 self.play_video = False
@@ -194,18 +248,19 @@ class MainScreen(Screen):
                 return
             texture = self.convert_to_texture(frame)
             self.ids.img1.texture = texture
-            if s.ball_insert:
+            if start_game or s.ball_insert:
                 level = s.level % 5
                 if level == 0:
                     level = 5
-                if self.start:  # begin ready go
+                if self.start:  # Begin ready go
                     self.start = False
                     play_sound("ready")
                     label = Label(text='Ready?',
                                   font_size=125,
+                                  font_name='PixelifySans',
                                   size_hint=(None, None),
                                   pos_hint={'center_x': 0.5, 'center_y': 0.5},
-                                  color=(1, 0, 0, 1),
+                                  color=(0.937, 0.137, 0.235, 1),
                                   outline_color=(1, 1, 1, 1),
                                   outline_width=3,
                                   bold=True
@@ -226,25 +281,20 @@ class MainScreen(Screen):
                 self.ids.insert_label.text = ''
                 self.ids.right_arrow_symbol.color = (1, 1, 1, 0)
                 self.ids.left_arrow_symbol.color = (1, 1, 1, 0)
+                self.ids.backarrow.color = (1, 1, 1, 0)
                 if s.maze_end_flag:
                     play_sound("victory")
                     self.timer = False
                     self.start = True
                     self.play_video = False
                     s.ball_insert = False
+                    start_game = False
                     if high_score.in_top_ten(level, s.maze_time):
                         SCREEN_MANAGER.transition = NoTransition()
                         SCREEN_MANAGER.current = LEFT_SCREEN_NAME
                     else:
                         SCREEN_MANAGER.transition = NoTransition()
                         SCREEN_MANAGER.current = RIGHT_SCREEN_NAME
-
-    # def red_button(self):  # temp kivy button
-    #     s.but1_presses = True
-    #
-    # def blue_button(self):  # temp kivy button
-    #     SCREEN_MANAGER.transition = NoTransition()
-    #     SCREEN_MANAGER.current = RIGHT_SCREEN_NAME
 
     def convert_to_texture(self, frame):
         global level
@@ -300,10 +350,19 @@ class MainScreen(Screen):
         self.ids.time_label.text = ''
         self.ids.right_arrow_symbol.color = (1, 1, 1, 1)
         self.ids.left_arrow_symbol.color = (1, 1, 1, 1)
+        self.ids.backarrow.color = (1, 1, 1, 1)
         s.ball_insert = False
         s.maze_end_flag = False
         self.reset_image()
         self.play_video = True
+
+    def back_to_main(self):
+        global current_screen
+        SCREEN_MANAGER.transition = NoTransition()
+        SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+        current_screen = 0
+        Clock.unschedule(self.update)
+        SCREEN_MANAGER.get_screen(MAIN_SCREEN_NAME).startClock()
 
 
 class RightScreen(Screen):
@@ -314,9 +373,11 @@ class RightScreen(Screen):
             self.clear_widgets()
             Clock.unschedule(auto_switch_screens)
             Clock.unschedule(self.switch_screen)
-            s.reset_button_states()
+            global current_screen
             SCREEN_MANAGER.transition = NoTransition()
             SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+            current_screen = 0
+            SCREEN_MANAGER.get_screen(MAIN_SCREEN_NAME).startClock()
 
     def start_clock(self):
         global auto_switch_screens
@@ -332,6 +393,7 @@ class RightScreen(Screen):
         global level
         self.add_widget(Label(
             text=f'Level {level} High Scores',
+            font_name= 'PixelifySans',
             font_size=75,
             size_hint=(None, None),
             pos_hint={'center_x': 0.5, 'top': 0.95},
@@ -351,7 +413,7 @@ class RightScreen(Screen):
         for i, score in enumerate(high_score.scores[level]):
             if i <= 9:
                 if score['time'] == s.maze_time:  # highlights last player who played
-                    self.highlight_last_player(y)
+                    self.highlight_last_player(y + 0.023) # magic numbers :D
                 minutes, seconds = divmod(score["time"], 60)
                 if minutes != 0:
                     text = f"{i + 1}. {score['name']} {int(minutes)}:{seconds:05.2f}"
@@ -367,7 +429,7 @@ class RightScreen(Screen):
                     dot_label = self.create_label("...", y, font)
                     self.add_widget(dot_label)
                     self.high_score_animation(dot_label, i + 1)
-                    y -= 0.0625
+                    y -= 0.0625 + 0.02 # magic numbers :D
                     self.highlight_last_player(y)
                     minutes, seconds = divmod(s.maze_time, 60)
                     placement = high_score.get_placement(level, s.maze_time)
@@ -381,6 +443,7 @@ class RightScreen(Screen):
                 break
         self.add_widget(Label(
             text="press any button to continue",
+            font_name= 'PixelifySans',
             pos_hint={'center_x': 0.5, 'top': 0.1},
             size_hint=(None, None),
             color=(1, 0, 0, 1),
@@ -396,6 +459,7 @@ class RightScreen(Screen):
             pos_hint={'top': y},
             pos=(960 * 3, 0),
             size_hint=(None, None),
+            font_name= 'PixelifySans',
             color=(1, 0, 0, 1),
             outline_color=(1, 1, 1, 1),
             outline_width=3,
@@ -405,9 +469,9 @@ class RightScreen(Screen):
 
     def highlight_last_player(self, y):
         img = Image(
-            source='glow_circle.png',
+            source='assets/glow_circle.png',
             size_hint=(None, None),
-            size=(1000, 100),
+            size=(800, 150),
             allow_stretch=True,
             keep_ratio=False,
             color=(1, 1, 1, 0),
@@ -429,13 +493,13 @@ class LeftScreen(Screen):
         Clock.schedule_interval(self.change_letter, 1.0 / 30.0)
 
     def arrow_animation(self, direction):
-        anim = Animation(size_hint=(0.115, 0.115), duration=0.05)
+        anim = Animation(size_hint=(0.325, 0.325), duration=0.05)
         if direction == "left":
             arrow = self.ids.left_arrow_symbol
         if direction == "right":
             arrow = self.ids.right_arrow_symbol
         anim.start(arrow)
-        anim.bind(on_complete=lambda *args: Animation(size_hint=(0.125, 0.125), duration=0.05).start(arrow))
+        anim.bind(on_complete=lambda *args: Animation(size_hint=(0.35, 0.35), duration=0.05).start(arrow))
 
     def change_letter(self, dt):
         global alphabet_list, abc, letter, name_letters, level
@@ -477,23 +541,23 @@ class LeftScreen(Screen):
         enter = self.ids.img2
         backspace = self.ids.img3
         if abc % 28 == 1:  # enter symbol is far left bs is offscreen
-            self.update_img_pos(enter, .3, .5, .135)
+            self.update_img_pos(enter, .3, .5, .265)
             self.update_img_pos(backspace, 0, 0, 0)
         elif abc % 28 == 0:  # enter symbol is on the mid left bs is far left
-            self.update_img_pos(enter, .4, .75, .15)
-            self.update_img_pos(backspace, .29, .5, .135)
+            self.update_img_pos(enter, .4, .75, .265)
+            self.update_img_pos(backspace, .29, .5, .265)
         elif abc % 28 == 27:  # enter symbol is in the middle
-            self.update_img_pos(enter, .5, 1, .165)
-            self.update_img_pos(backspace, .39, .75, .15)
+            self.update_img_pos(enter, .5, 1, .265)
+            self.update_img_pos(backspace, .39, .75, .265)
         elif abc % 28 == 26:  # enter symbol is on the mid right
-            self.update_img_pos(enter, .6, .75, .15)
-            self.update_img_pos(backspace, .49, 1, .165)
+            self.update_img_pos(enter, .6, .75, .265)
+            self.update_img_pos(backspace, .49, 1, .265)
         elif abc % 28 == 25:  # enter symbol is on the far right
-            self.update_img_pos(enter, .7, .5, .135)
-            self.update_img_pos(backspace, .59, .75, .15)
+            self.update_img_pos(enter, .7, .5, .265)
+            self.update_img_pos(backspace, .59, .75, .265)
         elif abc % 28 == 24:  # backspace symbol is on the far right
             self.update_img_pos(enter, 0, 0, 0)
-            self.update_img_pos(backspace, .69, .5, .135)
+            self.update_img_pos(backspace, .69, .5, .265)
         else:
             self.update_img_pos(enter, 0, 0, 0)  # both offscreen
             self.update_img_pos(backspace, 0, 0, 0)
@@ -504,9 +568,53 @@ class LeftScreen(Screen):
         self.ids.letter_5.text = alphabet_list[(abc + 2) % 28]
 
     def update_img_pos(self, img, x_pos, opacity, size_hint):
+        if img == self.ids.img3:
+            x_pos += 0.02
         img.pos_hint = {"center_x": x_pos}
         img.color = 1, 1, 1, opacity
         img.size_hint = (size_hint, size_hint)
+
+
+class Instructions(Screen):
+    def __init__(self, **kwargs):
+        super(Instructions, self).__init__(**kwargs)
+        Clock.schedule_interval(self.home, 1.0 / 60.0)
+
+    def home(self, dt):
+        global current_screen
+
+        if not current_screen == 1:
+            return
+
+        if s.check_button_presses(3):
+            play_sound("navigate")
+            SCREEN_MANAGER.transition.direction = "left"
+            SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+            current_screen = 0
+
+class Leaderboard(Screen):
+    def __init__(self, **kwargs):
+        super(Leaderboard, self).__init__(**kwargs)
+        Clock.schedule_interval(self.back_to_home, 1.0 / 60.0)
+
+    def back_to_home(self, dt):
+        global current_screen
+
+        if not current_screen == 2:
+            return
+
+        if s.check_button_presses(3):
+            play_sound("navigate")
+            SCREEN_MANAGER.transition.direction = "right" #right TO left
+            SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+            current_screen = 0
+
+    def fill_high_scores(self):
+        self.ids.high_scores.text = "Level One:     " + high_score.highest_score(1) + " seconds"
+        self.ids.high_scores.text += "\nLevel Two:    " + high_score.highest_score(2) + " seconds"
+        self.ids.high_scores.text += "\nLevel Three:   " + high_score.highest_score(3) + " seconds"
+        self.ids.high_scores.text += "\nLevel Four:   " + high_score.highest_score(4) + " seconds"
+        self.ids.high_scores.text += "\nLevel Five:   " + high_score.highest_score(5) + " seconds"
 
 
 class AdminScreen(Screen):
@@ -520,12 +628,12 @@ class AdminScreen(Screen):
         Lastly super Screen's __init__
         :param kwargs: Normal kivy.uix.screenmanager.Screen attributes
         """
-        Builder.load_file('AdminScreen.kv')
+        Builder.load_file('./src/AdminScreen.kv')
 
         PassCodeScreen.set_admin_events_screen(
             ADMIN_SCREEN_NAME)  # Specify screen name to transition to after correct password
         PassCodeScreen.set_transition_back_screen(
-            MAIN_SCREEN_NAME)  # set screen name to transition to if "Back to Game is pressed"
+            GAME_SCREEN_NAME)  # set screen name to transition to if "Back to Game is pressed"
 
         super(AdminScreen, self).__init__(**kwargs)
 
@@ -543,7 +651,7 @@ class AdminScreen(Screen):
         Transition back to the main screen
         :return:
         """
-        SCREEN_MANAGER.current = MAIN_SCREEN_NAME
+        SCREEN_MANAGER.current = GAME_SCREEN_NAME
 
     @staticmethod
     def shutdown():
@@ -566,12 +674,16 @@ class AdminScreen(Screen):
 Widget additions
 """
 
-Builder.load_file('VideoApp.kv')
+Builder.load_file('./src/VideoApp.kv')
 SCREEN_MANAGER.add_widget(MainScreen(name=MAIN_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(RightScreen(name=RIGHT_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(LeftScreen(name=LEFT_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(AdminScreen(name=ADMIN_SCREEN_NAME))
+SCREEN_MANAGER.add_widget(GameScreen(name=GAME_SCREEN_NAME))
+SCREEN_MANAGER.add_widget(Instructions(name=INSTRUCTIONS_SCREEN_NAME))
+SCREEN_MANAGER.add_widget(Leaderboard(name=LEADERBOARD_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(PassCodeScreen(name='passCode'))
 
 if __name__ == "__main__":
+    LabelBase.register(name='PixelifySans', fn_regular='/home/soft-dev/Documents/Inverted-Maze/assets/Pixelify_Sans/PixelifySans-VariableFont_wght.ttf')
     ProjectNameGUI().run()

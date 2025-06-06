@@ -11,6 +11,7 @@ import adafruit_max9744
 i2c = busio.I2C(board.SCL, board.SDA)
 amp = adafruit_max9744.MAX9744(i2c)
 amp.volume = 31  # set amp volume
+import src.my_logging as my_logging
 
 dpiComputer = DPiComputer()
 dpiPowerDrive = DPiPowerDrive()
@@ -36,7 +37,9 @@ class Maze_Client:
     def __init__(self):
         try:
             self.client = Client("172.17.21.1", 5001, PacketType)
+            my_logging.log_to_file("set client")
             self.client.connect()
+            my_logging.log_to_file("connected")
             dpiComputer.initialize()
             dpiPowerDrive.setBoardNumber(0)
             dpiPowerDrive.initialize()
@@ -45,12 +48,13 @@ class Maze_Client:
             for i in range(16):
                 dpiDigitalIn.setLatchActiveHigh(i)
             dpiDigitalIn.clearAllLatches()
-            print("Client initialized")
+            my_logging.log_to_file("Client initialized")
             self.button1_pressed = False
             self.button2_pressed = False
             self.button3_pressed = False
         except Exception as err:
             print("Client failed to initialize")
+            my_logging.error_to_file("failed to init")
             raise err
 
     def switch(self):
@@ -60,12 +64,14 @@ class Maze_Client:
                 packet_type = str(packet[0])
                 if packet_type == "PacketType.COMMAND1":
                     dpiPowerDrive.switchDriverOnOrOff(0, False)
+                    my_logging.log_to_file("Turn Drive Off")
                 elif packet_type == "PacketType.COMMAND2":
                     vol = int(packet[1].decode('utf-8'))
                     amp.volume = vol
                 elif packet_type == "PacketType.COMMAND3":
                     brightness = int(packet[1].decode('utf-8'))
                     dpiPowerDrive.setDriverPWM(0, brightness)
+                    my_logging.log_to_file("Set Brightness")
 
             except Exception as e:
                 self.client.send_packet(PacketType.RESPONSE_ERROR, bytearray(str(e), 'utf-8'))
@@ -73,6 +79,7 @@ class Maze_Client:
     def button1(self):
         if not dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_0) and not self.button1_pressed:
             self.client.send_packet(PacketType.COMMAND1, b"but1")
+            my_logging.log_to_file("Button 1 Pressed")
             self.button1_pressed = True
             sleep(0.05)
         elif dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_0) and self.button1_pressed:
@@ -81,6 +88,7 @@ class Maze_Client:
     def button2(self):
         if not dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_1) and not self.button2_pressed:
             self.client.send_packet(PacketType.COMMAND2, b"but2")
+            my_logging.log_to_file("Button 2 Pressed")
             self.button2_pressed = True
             sleep(0.05)
         elif dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_1) and self.button2_pressed:
@@ -89,6 +97,8 @@ class Maze_Client:
     def button3(self):
         if not dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_3) and not self.button3_pressed:
             self.client.send_packet(PacketType.COMMAND3, b"but3")
+            my_logging.log_to_file("Button 3 Pressed")
+
             self.button3_pressed = True
             sleep(0.05)
         elif dpiComputer.readDigitalIn(dpiComputer.IN_CONNECTOR__IN_3) and self.button3_pressed:
@@ -100,18 +110,25 @@ class Maze_Client:
 
     def ball_insert(self):
         self.client.send_packet(PacketType.COMMAND5, b'ball_insert')
+        my_logging.log_to_file("Insert Ball")
+
 
     def ping_test(self):
         if not dpiDigitalIn.ping():
+            my_logging.log_to_file("comms dpidigitalin failed")
             DDI = "Communication with the DPiDigitalIn board failed."
         else:
             DDI = "Communication with the DPiDigitalIn board succeeded."
+            my_logging.log_to_file("comms dpidigitalin suceeded")
         if not dpiPowerDrive.ping():
             DPD = "Communication with the DPiPowerDrive board failed."
+            my_logging.log_to_file("comms dpidigitalin failed")
         else:
             DPD = "Communication with the DPiPowerDrive board succeeded."
+            my_logging.log_to_file("comms dpidigitalin suceeds")
         payload = (DDI + "\n" + DPD).encode('utf-8')
         self.client.send_packet(PacketType.COMMAND6, payload)
+        my_logging.log_to_file("sent packet")
 
     def return_starting_time(self, time):
         payload = str(time).encode('utf-8')
