@@ -512,7 +512,7 @@ class LeftScreen(Screen):
             play_sound("navigate")
             self.arrow_animation("right")
         if s.check_button_presses(3):  # middle button pressed
-            if abc % 28 != 27 and abc % 28 != 26 and letter <= 30:  # if not enter symbol selected(and letter limit)
+            if abc % 28 != 27 and abc % 28 != 26 and letter <= 30 and len(name_letters) < 3:  # if not enter symbol selected(and letter limit)
                 play_sound("select")
                 name_letters += alphabet_list[abc % 28]
                 self.ids.name_label.text = name_letters
@@ -685,6 +685,6 @@ SCREEN_MANAGER.add_widget(Leaderboard(name=LEADERBOARD_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(PassCodeScreen(name='passCode'))
 
 if __name__ == "__main__":
-    LabelBase.register(name='BitcountGrid', fn_regular='/home/soft-dev/Documents/Inverted-Maze/assets/Bitcount_Grid_Double/BitcountGridDouble-VariableFont_CRSV,ELSH,ELXP,slnt,wght.ttf')
+    LabelBase.register(name='BitcountGrid', fn_regular='/home/soft-dev/Documents/Inverted-Maze/assets/Bitcount_Grid_Double/static/BitcountGridDouble-Regular.ttf')
     ProjectNameGUI().run()
 
