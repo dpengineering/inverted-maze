@@ -53,7 +53,7 @@ def run_switch():
 
 
 # Runs a shell script on the RPi to copy over and run client file
-client_thread = Thread(target=lambda: subprocess.run('./src/upload.sh'), daemon=True, name='Client Thread').start()
+client_thread = Thread(target=lambda: subprocess.run('/home/soft-dev/Documents/Inverted-Maze/src/upload.sh'), daemon=True, name='Client Thread').start()
 # Initializes server object which begins connection to client
 s = Maze_Server()
 # Allows the server to continuously receive packages from the client while still having access to Maze_Server functions
@@ -257,7 +257,7 @@ class GameScreen(Screen):
                     play_sound("ready")
                     label = Label(text='Ready?',
                                   font_size=125,
-                                  font_name='PixelifySans',
+                                  font_name='BitcountGrid',
                                   size_hint=(None, None),
                                   pos_hint={'center_x': 0.5, 'center_y': 0.5},
                                   color=(0.937, 0.137, 0.235, 1),
@@ -393,7 +393,7 @@ class RightScreen(Screen):
         global level
         self.add_widget(Label(
             text=f'Level {level} High Scores',
-            font_name= 'PixelifySans',
+            font_name= 'BitcountGrid',
             font_size=75,
             size_hint=(None, None),
             pos_hint={'center_x': 0.5, 'top': 0.95},
@@ -443,7 +443,7 @@ class RightScreen(Screen):
                 break
         self.add_widget(Label(
             text="press any button to continue",
-            font_name= 'PixelifySans',
+            font_name= 'BitcountGrid',
             pos_hint={'center_x': 0.5, 'top': 0.1},
             size_hint=(None, None),
             color=(1, 0, 0, 1),
@@ -459,7 +459,7 @@ class RightScreen(Screen):
             pos_hint={'top': y},
             pos=(960 * 3, 0),
             size_hint=(None, None),
-            font_name= 'PixelifySans',
+            font_name= 'BitcountGrid',
             color=(1, 0, 0, 1),
             outline_color=(1, 1, 1, 1),
             outline_width=3,
@@ -685,5 +685,6 @@ SCREEN_MANAGER.add_widget(Leaderboard(name=LEADERBOARD_SCREEN_NAME))
 SCREEN_MANAGER.add_widget(PassCodeScreen(name='passCode'))
 
 if __name__ == "__main__":
-    LabelBase.register(name='PixelifySans', fn_regular='/home/soft-dev/Documents/Inverted-Maze/assets/Pixelify_Sans/PixelifySans-VariableFont_wght.ttf')
+    LabelBase.register(name='BitcountGrid', fn_regular='/home/soft-dev/Documents/Inverted-Maze/assets/Bitcount_Grid_Double/BitcountGridDouble-VariableFont_CRSV,ELSH,ELXP,slnt,wght.ttf')
     ProjectNameGUI().run()
+

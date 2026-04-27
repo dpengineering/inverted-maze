@@ -5,6 +5,8 @@ A game where the user controls a maze using handles in order to get the pool bal
 
 This project is equipped with a Raspberry Pi 3 and an HP Z2 Mini G4 Workstation. The HP workstation (server) is the main processor and powers the main monitor of the project. On the other hand, the Raspberry Pi (client) communicates with the hardware (sensors and buttons) and relays these events to the socket server, which is hosted on the main workstation.  
 
+The username for the HP station is `soft-dev` and `pi` for the Pi 3.
+
 - [dpea_p2p](./dpea_p2p/): Standardized DPEA peer-to-peer communication wrapper for socket communications, used on both the workstation and the Raspberry Pi.
 - [client.py](): Interface used to link the server to the buttons connected to the Raspberry Pi
 - [main.py](): A monolithic main file that contains all Kivy code, including the Main Screen, Game Screen, Leadeboard, Instructions, and camera vision
